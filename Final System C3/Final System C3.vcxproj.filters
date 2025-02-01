@@ -26,5 +26,8 @@
     <ClInclude Include="SFLA.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Frog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

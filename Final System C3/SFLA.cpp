@@ -1,4 +1,4 @@
-#include "systemc.h"
+#include "Frog.h"
 #include "SFLA.h"
 #include <vector>
 #include <random>
@@ -19,7 +19,7 @@ void SFLA::start() {
         all_frogs[i].fitness = fitness_function(all_frogs[i].solution);
     }
 
-    fitness_sorter();
+    fitness_sorter(all_frogs);
 
     for (int i = 0; i < NUMBER_OF_FROGS; i++) {
         //cout << "\nIndex:" << all_frogs[i].frog_index << "\nFitness:" << all_frogs[i].fitness << '\n';
@@ -36,17 +36,19 @@ void SFLA::start() {
 
     compute_selection_probabilities();
 
-    cout << selection_probabilities[all_frogs[2].memplex_offset];
+
 
 }
 
 void SFLA::initial_frogs() {
     //srand(time(0)); //random seed init
     for (int i = 0; i < NUMBER_OF_FROGS; i++) {
+        Frog curFrog;
         for (int j = 0; j < NUMBER_OF_ITEMS; ++j) {
-            all_frogs[i].solution[j] = (rand()) % 2;
+            curFrog.solution[j] = (rand()) % 2;
         }
-        all_frogs[i].allfrogs_index = i;
+        curFrog.allfrogs_index = i;
+        all_frogs.push_back(curFrog);
     }
 }
 
@@ -71,8 +73,8 @@ int SFLA::fitness_function(sc_bv<NUMBER_OF_ITEMS> solution) {
 }
 
 
-void SFLA::fitness_sorter() {
-    std::sort(std::begin(all_frogs), std::end(all_frogs), [](const Frog& firstFrog, const Frog& secondFrog) {
+void SFLA::fitness_sorter(std::vector<Frog>& frogs) {
+    std::sort(std::begin(frogs), std::end(frogs), [](const Frog& firstFrog, const Frog& secondFrog) {
         return firstFrog.fitness > secondFrog.fitness;
         });
 }
