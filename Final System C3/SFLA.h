@@ -1,12 +1,12 @@
 #include <systemc.h>
 
-#define NUMBER_OF_FROGS 10 // number of solutions
+#define NUMBER_OF_FROGS 12 // number of solutions
 
 #define NUMBER_OF_MEMPLEX 2
 
 #define NUMBER_OF_ITEMS 9 // number of items
 
-#define Q_SELECTION 3 // number of chosen frogs from each memplex for evol
+#define Q_SELECTION 2 // number of chosen frogs from each memplex for evol
 
 struct Frog {
 	sc_bv<NUMBER_OF_ITEMS> solution;
@@ -34,7 +34,7 @@ SC_MODULE(SFLA) {
 
 	void compute_selection_probabilities();
 
-	void select_q_frogs();
+	void select_q_frogs(int memplex_id);
 
 
 	SC_CTOR(SFLA) {

@@ -8,6 +8,9 @@ std::vector<std::vector<Frog>> memplexes(NUMBER_OF_MEMPLEX);
 
 std::vector<double> selection_probabilities;
 
+
+Frog selected_frogs[NUMBER_OF_MEMPLEX][Q_SELECTION]; // Stores selected frogs per memplex
+
 void SFLA::start() {
 
     initial_frogs(); //soft
@@ -82,6 +85,7 @@ void SFLA::memplex_partition() {
         memplex.clear();
     }
 
+
     for (int i = 0; i < NUMBER_OF_FROGS; i++) {
         int memplex_id = i % NUMBER_OF_MEMPLEX;
         all_frogs[i].memplex_index = memplex_id;
@@ -102,12 +106,11 @@ void SFLA::compute_selection_probabilities() {
     selection_probabilities.clear();
     double sum_pn = 0;
 
-    for (int j = 0; j < n; j++) {
-        double p_n = (2.0 * (n + 1 - (j + 1))) / (n * (n + 1));
+    for (int j = 1; j <= n; j++) {
+        double p_n = (2.0 * (n + 1 - j)) / (n * (n + 1));
         selection_probabilities.push_back(p_n);
         sum_pn += p_n;
     }
-
     //normalize
     for (double& p : selection_probabilities) {
         p /= sum_pn;
@@ -118,4 +121,33 @@ void SFLA::compute_selection_probabilities() {
         cout << p << " ";
     }
     cout << '\n';
+}
+
+// --------------------
+//TODO: HATMAN BE RESET KARDAN SELECTED FROGS HAVASEMUN BASHE 
+// --------------------
+void SFLA::select_q_frogs(int memplex_id) {
+    int n = NUMBER_OF_FROGS / NUMBER_OF_MEMPLEX;
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::discrete_distribution<int> dist(&selection_probabilities[0], &selection_probabilities[0] + n);
+
+    bool selected[NUMBER_OF_FROGS / NUMBER_OF_MEMPLEX] = { false };
+
+    std::cout << "Selected frogs from Memplex " << memplex_id << ": ";
+
+    for (int i = 0; i < Q_SELECTION; i++) {
+        int selected_index;
+        do {
+            selected_index = dist(gen);
+        } while (selected[selected_index]); // Ensure unique selection
+
+        selected[selected_index] = true; // Mark this frog as selected
+        selected_frogs[memplex_id][i] = memplexes[memplex_id][selected_index];
+
+        std::cout << "[Fitness: " << selected_frogs[memplex_id][i].fitness
+            << ", Offset: " << selected_frogs[memplex_id][i].memplex_offset << "] ";
+    }
+    std::cout << std::endl;
 }
