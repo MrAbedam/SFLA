@@ -48,11 +48,75 @@ void SFLA::start() {
     fitness_sorter(selected_frogs[0]);
     //---------------------------------
     
+    evolution_frog(0);
+    for (int i = 0; i < NUMBER_OF_FROGS; i++) {
+        //cout << "\nIndex:" << all_frogs[i].frog_index << "\nFitness:" << all_frogs[i].fitness << '\n';
+        cout << "\nFitness:" << all_frogs[i].fitness << '\n';
+        for (int j = 0; j < NUMBER_OF_ITEMS; ++j) {
+            cout << all_frogs[i].solution[j] << " ";
+        }
+        cout << '\n';
+    }
+
     //EVOLVE
 }
 
+int hamming_distance(const sc_bv<NUMBER_OF_ITEMS>& U1, const sc_bv<NUMBER_OF_ITEMS>& U2) {
+    int distance = 0;
+    for (int i = 0; i < NUMBER_OF_ITEMS; i++) {
+        if (U1[i] != U2[i]) {
+            distance++;
+        }
+    }
+    return distance;
+}
+
+void SFLA::evolution_frog(int selected_id) {
+    sc_bv<NUMBER_OF_ITEMS> newSolution;
+    
+
+    int leftSideStep;// hamming_distance(Uw.solution, Ub.solution)
+    
+    int current_iteration = 0;
+    bool step1, step2;
+    do {
+        fitness_sorter(selected_frogs[selected_id]);
+
+        Frog& Uw = selected_frogs[selected_id][Q_SELECTION - 1];
+        Frog& Ub = selected_frogs[selected_id][0];
+        cout << "\nold least is:" << Uw.fitness << '\n';
+        //part1 Uw and Ub
+        /*
+        if (updateUwBasedOnUb()) {
+            current_iteration++;
+            continue;
+        }
+
+        //part2 Uw and Ug
+        if (updateUwBasedOnUg()) {
+            current_iteration++;
+            continue
+        }
+        */
+        //part3 Random
+        current_iteration++;
+        for (int j = 0; j < NUMBER_OF_ITEMS; ++j) {
+            newSolution[j] = (rand()) % 2;
+        }
+
+        //setup new Uwprime
+        Uw.solution = newSolution;
+        Uw.fitness = fitness_function(newSolution);
+        all_frogs[Uw.allfrogs_index] = Uw;
+        cout << "\nNEW SOLUTION " << Uw.solution << " NEW FITNESS " << Uw.fitness;
+    } while (current_iteration <= L_MAX_ITERATION);
+
+
+
+}
+
 void SFLA::initial_frogs() {
-    //srand(time(0)); //random seed init
+    srand(time(0)); //random seed init
     for (int i = 0; i < NUMBER_OF_FROGS; i++) {
         Frog curFrog;
         for (int j = 0; j < NUMBER_OF_ITEMS; ++j) {
@@ -88,6 +152,9 @@ void SFLA::fitness_sorter(std::vector<Frog>& frogs) {
     std::sort(std::begin(frogs), std::end(frogs), [](const Frog& firstFrog, const Frog& secondFrog) {
         return firstFrog.fitness > secondFrog.fitness;
         });
+    for (int i = 0; i < NUMBER_OF_FROGS; i++) {
+        all_frogs[i].allfrogs_index = i;
+    }
 }
 
 

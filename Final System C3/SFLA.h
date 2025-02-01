@@ -22,6 +22,9 @@ SC_MODULE(SFLA) {
 
 	void select_q_frogs(int memplex_id);
 
+	void evolution_frog(int selected_id);
+
+	int hamming_distance(sc_bv<NUMBER_OF_ITEMS> U1, sc_bv<NUMBER_OF_ITEMS> U2);
 
 	SC_CTOR(SFLA) {
 		SC_METHOD(start);
