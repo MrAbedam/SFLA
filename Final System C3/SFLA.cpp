@@ -1,10 +1,17 @@
 #include "systemc.h"
 #include "SFLA.h"
+#include <vector>
+#include <random>
+
+
+std::vector<std::vector<Frog>> memplexes(NUMBER_OF_MEMPLEX);
+
+std::vector<double> selection_probabilities;
 
 void SFLA::start() {
 
-	initial_frogs(); //soft
-    
+    initial_frogs(); //soft
+
     for (int i = 0; i < NUMBER_OF_FROGS; i++) {
         all_frogs[i].fitness = fitness_function(all_frogs[i].solution);
     }
@@ -12,22 +19,31 @@ void SFLA::start() {
     fitness_sorter();
 
     for (int i = 0; i < NUMBER_OF_FROGS; i++) {
+        //cout << "\nIndex:" << all_frogs[i].frog_index << "\nFitness:" << all_frogs[i].fitness << '\n';
+        cout << "\nFitness:" << all_frogs[i].fitness << '\n';
         for (int j = 0; j < NUMBER_OF_ITEMS; ++j) {
             cout << all_frogs[i].solution[j] << " ";
         }
-        cout << '\n' << all_frogs[i].fitness << '\n';
+        cout << '\n';
     }
 
+    cout << '\n';
+
+    memplex_partition();
+
+    compute_selection_probabilities();
+
+    cout << selection_probabilities[all_frogs[2].memplex_offset];
 
 }
 
-//random initial generate solution
 void SFLA::initial_frogs() {
-    srand(time(0)); //random seed init
+    //srand(time(0)); //random seed init
     for (int i = 0; i < NUMBER_OF_FROGS; i++) {
         for (int j = 0; j < NUMBER_OF_ITEMS; ++j) {
             all_frogs[i].solution[j] = (rand()) % 2;
         }
+        all_frogs[i].allfrogs_index = i;
     }
 }
 
@@ -56,4 +72,50 @@ void SFLA::fitness_sorter() {
     std::sort(std::begin(all_frogs), std::end(all_frogs), [](const Frog& firstFrog, const Frog& secondFrog) {
         return firstFrog.fitness > secondFrog.fitness;
         });
+}
+
+
+
+
+void SFLA::memplex_partition() {
+    for (auto& memplex : memplexes) {
+        memplex.clear();
+    }
+
+    for (int i = 0; i < NUMBER_OF_FROGS; i++) {
+        int memplex_id = i % NUMBER_OF_MEMPLEX;
+        all_frogs[i].memplex_index = memplex_id;
+        all_frogs[i].memplex_offset = memplexes[memplex_id].size();
+        memplexes[memplex_id].push_back(all_frogs[i]);
+    }
+
+    for (int i = 0; i < NUMBER_OF_FROGS; i++) {
+        std::cout << "[" << all_frogs[i].fitness << ", " << all_frogs[i].memplex_index << ", " << all_frogs[i].memplex_offset << "]\n";
+    }
+}
+
+
+
+void SFLA::compute_selection_probabilities() {
+    int n = NUMBER_OF_FROGS / NUMBER_OF_MEMPLEX; // size of each memplex
+
+    selection_probabilities.clear();
+    double sum_pn = 0;
+
+    for (int j = 0; j < n; j++) {
+        double p_n = (2.0 * (n + 1 - (j + 1))) / (n * (n + 1));
+        selection_probabilities.push_back(p_n);
+        sum_pn += p_n;
+    }
+
+    //normalize
+    for (double& p : selection_probabilities) {
+        p /= sum_pn;
+    }
+
+    cout << "Shared Probabilities: ";
+    for (double p : selection_probabilities) {
+        cout << p << " ";
+    }
+    cout << '\n';
 }
