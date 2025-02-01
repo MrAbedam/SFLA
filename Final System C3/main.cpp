@@ -1,5 +1,4 @@
 #include "SFLA.h"
-#include "Frog.h"
 
 int sc_main(int argc, char* argv[]) {
     SFLA mySFLA("my_sfla");

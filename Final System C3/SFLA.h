@@ -1,4 +1,3 @@
-#include <systemc.h>
 #include "Frog.h"
 
 SC_MODULE(SFLA) {
