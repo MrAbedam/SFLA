@@ -8,8 +8,11 @@ std::vector<std::vector<Frog>> memplexes(NUMBER_OF_MEMPLEX);
 
 std::vector<double> selection_probabilities;
 
+std::vector<std::vector<Frog>> selected_frogs(NUMBER_OF_MEMPLEX);
 
-Frog selected_frogs[NUMBER_OF_MEMPLEX][Q_SELECTION]; // Stores selected frogs per memplex
+//Frog selected_frogs[NUMBER_OF_MEMPLEX][Q_SELECTION]; // Stores selected frogs per memplex
+
+Frog Ug;
 
 void SFLA::start() {
 
@@ -32,12 +35,20 @@ void SFLA::start() {
 
     cout << '\n';
 
+
+    Ug = all_frogs[0];
+
     memplex_partition();
 
     compute_selection_probabilities();
+    
 
-
-
+    //--------- Paralel for all i's
+    select_q_frogs(0);
+    fitness_sorter(selected_frogs[0]);
+    //---------------------------------
+    
+    //EVOLVE
 }
 
 void SFLA::initial_frogs() {
@@ -146,7 +157,7 @@ void SFLA::select_q_frogs(int memplex_id) {
         } while (selected[selected_index]); // Ensure unique selection
 
         selected[selected_index] = true; // Mark this frog as selected
-        selected_frogs[memplex_id][i] = memplexes[memplex_id][selected_index];
+        selected_frogs[memplex_id].push_back(memplexes[memplex_id][selected_index]);
 
         std::cout << "[Fitness: " << selected_frogs[memplex_id][i].fitness
             << ", Offset: " << selected_frogs[memplex_id][i].memplex_offset << "] ";

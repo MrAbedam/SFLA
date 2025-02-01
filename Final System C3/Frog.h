@@ -15,4 +15,3 @@ struct Frog {
 	int memplex_index;
 	int memplex_offset;
 };
-#pragma once
