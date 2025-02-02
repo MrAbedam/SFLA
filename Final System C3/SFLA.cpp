@@ -10,8 +10,8 @@ std::vector<double> selection_probabilities;
 
 std::vector<std::vector<Frog>> selected_frogs(NUMBER_OF_MEMPLEX);
 
-//Frog selected_frogs[NUMBER_OF_MEMPLEX][Q_SELECTION]; // Stores selected frogs per memplex
 
+int UgFitnessChange = 10000; // more accurate to condiser sigma of all knapsack items
 Frog Ug;
 
 void SFLA::start() {
@@ -36,8 +36,10 @@ void SFLA::start() {
     cout << '\n';
 
 
-    Ug = all_frogs[0];
+    //GMAX FROM HERE
 
+    Ug = all_frogs[0];
+    fitness_sorter(all_frogs);
     memplex_partition();
 
     compute_selection_probabilities();
@@ -47,7 +49,6 @@ void SFLA::start() {
     select_q_frogs(0);
     fitness_sorter(selected_frogs[0]);
     //---------------------------------
-    
     evolution_frog(0);
     for (int i = 0; i < NUMBER_OF_FROGS; i++) {
         //cout << "\nIndex:" << all_frogs[i].frog_index << "\nFitness:" << all_frogs[i].fitness << '\n';
@@ -61,7 +62,7 @@ void SFLA::start() {
     //EVOLVE
 }
 
-int hamming_distance(const sc_bv<NUMBER_OF_ITEMS>& U1, const sc_bv<NUMBER_OF_ITEMS>& U2) {
+int SFLA::hamming_distance(sc_bv<NUMBER_OF_ITEMS>& U1, sc_bv<NUMBER_OF_ITEMS>& U2) {
     int distance = 0;
     for (int i = 0; i < NUMBER_OF_ITEMS; i++) {
         if (U1[i] != U2[i]) {
@@ -71,47 +72,138 @@ int hamming_distance(const sc_bv<NUMBER_OF_ITEMS>& U1, const sc_bv<NUMBER_OF_ITE
     return distance;
 }
 
+bool SFLA::updateUwBasedOnUb(int selected_id) {
+
+
+    Frog& Uw = selected_frogs[selected_id][Q_SELECTION - 1];
+    Frog& Ub = selected_frogs[selected_id][0];
+
+    int random_number = 1;///TODO: ADD RAND TO STEP
+
+    int maxStepSize = STEP_SIZE_MAX;
+    int finalMaxStep = std::min(random_number * hamming_distance(Uw.solution, Ub.solution), maxStepSize);
+    int curFitness = Uw.fitness;
+
+    sc_bv<NUMBER_OF_ITEMS> newTestSolution;
+    for (int i = 0; i < NUMBER_OF_ITEMS; i++) {
+        newTestSolution[i] = Uw.solution[i];
+    }
+
+    int steps_used = 0;
+    for (int i = 0; i < NUMBER_OF_ITEMS; i++) {
+        if (Ub.solution[i] != Uw.solution[i]) {
+            cout << i << " ";
+            newTestSolution[i] = Ub.solution[i]; // Move towards U_B
+            steps_used++;
+            if (steps_used >= finalMaxStep) {
+                cout << "\nMAX STEPS USED!!";
+                break;
+            }
+        }
+    }
+
+    int newFitness = fitness_function(newTestSolution);
+
+
+    cout << "\nUb fitness and solution: " << Ub.fitness << "  -  " << Ub.solution;
+    cout << "\nUw fitness and solution: " << Uw.fitness << "  -  " << Uw.solution;
+    cout << "\nUWprime    and solution: " << newFitness << "  -  " << newTestSolution;
+
+    if (newFitness > curFitness) {
+        setupUwprime(selected_id, newTestSolution);
+        cout << "\nUb USED";
+        return true;
+    }
+    return false;
+}
+
+
+bool SFLA::updateUwBasedOnUg(int selected_id) {
+
+
+    Frog& Uw = selected_frogs[selected_id][Q_SELECTION - 1];
+
+    int random_number = 1;///TODO: ADD RAND TO STEP
+
+    int maxStepSize = STEP_SIZE_MAX;
+    int finalMaxStep = std::min(random_number * hamming_distance(Uw.solution, Ug.solution), maxStepSize);
+    int curFitness = Uw.fitness;
+
+    sc_bv<NUMBER_OF_ITEMS> newTestSolution; 
+    for (int i = 0; i < NUMBER_OF_ITEMS; i++) {
+        newTestSolution[i] = Uw.solution[i];
+    }
+
+    int steps_used = 0;
+    for (int i = 0; i < NUMBER_OF_ITEMS; i++) {
+        if (Ug.solution[i] != Uw.solution[i]) {
+            cout <<"\n" << i << " ";
+            newTestSolution[i] = Ug.solution[i]; // Move towards Ug
+            steps_used++;
+            if (steps_used >= finalMaxStep) {
+                cout << "\nMAX STEPS USED!!";
+                break;
+            }
+        }
+    }
+
+    int newFitness = fitness_function(newTestSolution);
+
+
+    cout << "\nUb fitness and solution: " << Ug.fitness << "  -  " << Ug.solution;
+    cout << "\nUw fitness and solution: " << Uw.fitness << "  -  " << Uw.solution;
+    cout << "\nUWprime    and solution: " << newFitness << "  -  " << newTestSolution;
+
+    if (newFitness > curFitness) {
+        setupUwprime(selected_id, newTestSolution);
+        cout << "\nUg USED";
+        return true;
+    }
+    return false;
+}
+
 void SFLA::evolution_frog(int selected_id) {
     sc_bv<NUMBER_OF_ITEMS> newSolution;
-    
-
-    int leftSideStep;// hamming_distance(Uw.solution, Ub.solution)
-    
+   
     int current_iteration = 0;
-    bool step1, step2;
+
     do {
-        fitness_sorter(selected_frogs[selected_id]);
+        fitness_sorter(selected_frogs[selected_id]);//selected_frogs[0] => Ub
+        fitness_sorter(all_frogs); //all_frogs[0] => Ug
 
         Frog& Uw = selected_frogs[selected_id][Q_SELECTION - 1];
-        Frog& Ub = selected_frogs[selected_id][0];
-        cout << "\nold least is:" << Uw.fitness << '\n';
+        cout << "\nold least is:" << Uw.fitness <<"  "<<Uw.solution << '\n';
         //part1 Uw and Ub
-        /*
-        if (updateUwBasedOnUb()) {
-            current_iteration++;
-            continue;
+        
+        if (updateUwBasedOnUb(selected_id)) {
         }
-
+        
         //part2 Uw and Ug
-        if (updateUwBasedOnUg()) {
-            current_iteration++;
-            continue
-        }
-        */
-        //part3 Random
-        current_iteration++;
-        for (int j = 0; j < NUMBER_OF_ITEMS; ++j) {
-            newSolution[j] = (rand()) % 2;
+        else if (updateUwBasedOnUg(selected_id)) {
         }
 
-        //setup new Uwprime
-        Uw.solution = newSolution;
-        Uw.fitness = fitness_function(newSolution);
-        all_frogs[Uw.allfrogs_index] = Uw;
-        cout << "\nNEW SOLUTION " << Uw.solution << " NEW FITNESS " << Uw.fitness;
+        //part3 Random
+        else {
+            for (int j = 0; j < NUMBER_OF_ITEMS; ++j) {
+                newSolution[j] = (rand()) % 2;
+                cout << "\nCASE RANDOM";
+                setupUwprime(selected_id, newSolution);
+            }
+        }
+        current_iteration++;
+        cout <<"\nUG FITNESS"<<Ug.fitness << "\n";
     } while (current_iteration <= L_MAX_ITERATION);
 
+    //Alternate interp: set Ug = all_frogs[0] over here (just in case)
+}
 
+void SFLA::setupUwprime(int selected_id, sc_bv<NUMBER_OF_ITEMS> &newSolution) {
+    Frog& Uw = selected_frogs[selected_id][Q_SELECTION - 1];
+
+    Uw.solution = newSolution;
+    Uw.fitness = fitness_function(newSolution);
+    all_frogs[Uw.allfrogs_index] = Uw;
+    cout << "\nNEW SOLUTION " << Uw.solution << " NEW FITNESS " << Uw.fitness;
 
 }
 
@@ -155,6 +247,7 @@ void SFLA::fitness_sorter(std::vector<Frog>& frogs) {
     for (int i = 0; i < NUMBER_OF_FROGS; i++) {
         all_frogs[i].allfrogs_index = i;
     }
+    Ug = all_frogs[0];
 }
 
 
@@ -174,7 +267,7 @@ void SFLA::memplex_partition() {
     }
 
     for (int i = 0; i < NUMBER_OF_FROGS; i++) {
-        std::cout << "[" << all_frogs[i].fitness << ", " << all_frogs[i].memplex_index << ", " << all_frogs[i].memplex_offset << "]\n";
+        std::cout << "[" << all_frogs[i].fitness << ", " << all_frogs[i].memplex_index << ", " << all_frogs[i].memplex_offset << "] Solution: " << all_frogs[i].solution<<"\n";
     }
 }
 
@@ -195,12 +288,12 @@ void SFLA::compute_selection_probabilities() {
     for (double& p : selection_probabilities) {
         p /= sum_pn;
     }
-
+    /*
     cout << "Shared Probabilities: ";
     for (double p : selection_probabilities) {
         cout << p << " ";
     }
-    cout << '\n';
+    cout << '\n';*/
 }
 
 // --------------------

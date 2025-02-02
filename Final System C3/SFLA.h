@@ -24,7 +24,15 @@ SC_MODULE(SFLA) {
 
 	void evolution_frog(int selected_id);
 
-	int hamming_distance(sc_bv<NUMBER_OF_ITEMS> U1, sc_bv<NUMBER_OF_ITEMS> U2);
+	int hamming_distance(sc_bv<NUMBER_OF_ITEMS>&U1, sc_bv<NUMBER_OF_ITEMS>&U2);
+
+	bool updateUwBasedOnUb(int selected_id);
+
+	bool updateUwBasedOnUg(int selected_id);
+
+	void setupUwprime(int selected_id, sc_bv<NUMBER_OF_ITEMS> &newSolution);
+
+
 
 	SC_CTOR(SFLA) {
 		SC_METHOD(start);

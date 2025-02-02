@@ -8,7 +8,9 @@
 
 #define Q_SELECTION 3 // number of chosen frogs from each memplex for evol
 
-#define L_MAX_ITERATION 2
+#define L_MAX_ITERATION 10
+
+#define STEP_SIZE_MAX 1
 
 struct Frog {
 	sc_bv<NUMBER_OF_ITEMS> solution;
