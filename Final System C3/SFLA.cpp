@@ -15,19 +15,30 @@ std::vector<std::vector<Frog>> selected_frogs(NUMBER_OF_MEMPLEX);
 int UgFitnessChange = 10000; // more accurate to condiser sigma of all knapsack items
 Frog Ug;
 
+#define NUMBER_OF_FROGS 6
+#define NUMBER_OF_MEMPLEX 2
+#define NUMBER_OF_ITEMS 9
+#define Q_SELECTION 2
+#define L_MAX_ITERATION 2
+#define STEP_SIZE_MAX 1
+
+
 void SFLA::start() {
-    cout << "ALGO STARTED";
+    cout << "\n                           PHASE 0 _ PARAMETERS";
+    cout << "\nNUMBER_OF_FROGS " << NUMBER_OF_FROGS;
+    cout << "\nNUMBER_OF_MEMPLEX " << NUMBER_OF_MEMPLEX;
+    cout << "\nNUMBER_OF_ITEMS " << NUMBER_OF_ITEMS;
+    cout << "\nQ_SELECTION " << Q_SELECTION;
+    cout << "\nL_MAX_ITERATION " << L_MAX_ITERATION;
+    cout << "\nSTEP_SIZE_MAX " << STEP_SIZE_MAX;
+    cout << "\n _______________________________________________________________";
+    cout << "\n\n                 PHASE1 _ INIT FROGS, SET FITNESS AND SORT\n";
+
     receive_init_frogs();
-
-    fitness_sorter(all_frogs);
-
-
     for (int i = 0; i < NUMBER_OF_FROGS; i++) {
         all_frogs[i].fitness = fitness_function(all_frogs[i].solution);
     }
-
     fitness_sorter(all_frogs);
-
     for (int i = 0; i < NUMBER_OF_FROGS; i++) {
         cout << "\nFitness:" << all_frogs[i].fitness << '\n';
         for (int j = 0; j < NUMBER_OF_ITEMS; ++j) {
@@ -36,8 +47,7 @@ void SFLA::start() {
         cout << '\n';
     }
 
-    cout << '\n';
-
+    cout << "_______________________________________________________________\n                   PHASE2 _ MEMPLEX PARTITION\n\n";
 
     //GMAX FROM HERE
 
@@ -45,8 +55,11 @@ void SFLA::start() {
     fitness_sorter(all_frogs);
     memplex_partition();
 
+
+    cout << "_______________________________________________________________\n                   PHASE3 _ PROBABILITY CALCULATION\n";
     compute_selection_probabilities();
-    
+
+    cout << "_______________________________________________________________\n                   PHASE4 _ SELECT Q FROGS\n";
 
     //--------- Paralel for all i's
     select_q_frogs(0);
@@ -111,7 +124,7 @@ bool SFLA::updateUwBasedOnUb(int selected_id) {
             newTestSolution[i] = Ub.solution[i]; // Move towards U_B
             steps_used++;
             if (steps_used >= finalMaxStep) {
-                cout << "\nMAX STEPS USED!!";
+                cout << "\nMAX STEPS USED!";
                 break;
             }
         }
@@ -126,7 +139,7 @@ bool SFLA::updateUwBasedOnUb(int selected_id) {
 
     if (newFitness > curFitness) {
         setupUwprime(selected_id, newTestSolution);
-        cout << "\nUb USED";
+        cout << "\n         UB USED BY MEMPLEX " << selected_id;
         return true;
     }
     return false;
@@ -171,7 +184,7 @@ bool SFLA::updateUwBasedOnUg(int selected_id) {
 
     if (newFitness > curFitness) {
         setupUwprime(selected_id, newTestSolution);
-        cout << "\nUg USED";
+        cout << "\n         UG USED BY MEMPLEX " << selected_id; 
         return true;
     }
     return false;
@@ -201,14 +214,15 @@ void SFLA::evolution_frog(int selected_id) {
         else {
             for (int j = 0; j < NUMBER_OF_ITEMS; ++j) {
                 newSolution[j] = (rand()) % 2;
-                cout << "\nCASE RANDOM";
+                cout << "\n         RANDOM USED BY MEMPLEX: "<<selected_id;
                 setupUwprime(selected_id, newSolution);
             }
         }
         current_iteration++;
+        fitness_sorter(all_frogs); // if we have to update ug each time
         cout <<"\nUG FITNESS"<<Ug.fitness << "\n";
     } while (current_iteration <= L_MAX_ITERATION);
-
+    fitness_sorter(all_frogs);
     //Alternate interp: set Ug = all_frogs[0] over here (just in case)
 }
 
@@ -268,9 +282,11 @@ void SFLA::memplex_partition() {
         all_frogs[i].memplex_offset = memplexes[memplex_id].size();
         memplexes[memplex_id].push_back(all_frogs[i]);
     }
+    for (int i = 0; i < NUMBER_OF_MEMPLEX; i++) {
+        for (int j = 0; j < NUMBER_OF_FROGS / NUMBER_OF_MEMPLEX; j++) {
+                std::cout << "[" << memplexes[i][j].fitness << ", " << i << ", " << j << "] Solution: " << memplexes[i][j].solution<<"\n";
 
-    for (int i = 0; i < NUMBER_OF_FROGS; i++) {
-        std::cout << "[" << all_frogs[i].fitness << ", " << all_frogs[i].memplex_index << ", " << all_frogs[i].memplex_offset << "] Solution: " << all_frogs[i].solution<<"\n";
+        }
     }
 }
 
@@ -291,12 +307,11 @@ void SFLA::compute_selection_probabilities() {
     for (double& p : selection_probabilities) {
         p /= sum_pn;
     }
-    /*
     cout << "Shared Probabilities: ";
     for (double p : selection_probabilities) {
         cout << p << " ";
     }
-    cout << '\n';*/
+    cout << '\n';
 }
 
 // --------------------
