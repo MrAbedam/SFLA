@@ -63,7 +63,7 @@ void SFLA::start() {
         for (int i = 0; i < NUMBER_OF_MEMPLEX; i++) {
             sc_spawn(sc_bind(&SFLA::memplex_evolution, this, i));
         }
-        wait(sc_time(1, SC_NS));
+        wait(evolves_complte[0] & evolves_complte[1]);
         fitness_sorter(all_frogs, true);
         if (abs(Ug.fitness - all_frogs[0].fitness) <= EPSILON_CHANGE_UG){
             // Ug didnt change
@@ -101,6 +101,7 @@ void SFLA::memplex_evolution(int memplex_id) {
             cout << '\n';
         }
     }
+    evolves_complte[memplex_id].notify();
 }
 
 void SFLA::receive_init_frogs() {
@@ -220,7 +221,6 @@ void SFLA::evolution_frog(int selected_id) {
 
     do {
         fitness_sorter(selected_frogs[selected_id], false);//selected_frogs[0] => Ub
-        fitness_sorter(all_frogs, true); //all_frogs[0] => Ug
 
         Frog& Uw = selected_frogs[selected_id][Q_SELECTION - 1];
         cout << "\nold least is:" << Uw.fitness <<"  "<<Uw.solution << '\n';
@@ -246,10 +246,8 @@ void SFLA::evolution_frog(int selected_id) {
         cout << "\n//-----------------------------------------//\n";
 
         current_iteration++;
-        fitness_sorter(all_frogs, true); // if we have to update ug each time
         cout <<"\nUG FITNESS"<<Ug.fitness << "\n";
     } while (current_iteration <= L_MAX_ITERATION);
-    fitness_sorter(all_frogs, false);
     //Alternate interp: set Ug = all_frogs[0] over here (just in case)
 }
 

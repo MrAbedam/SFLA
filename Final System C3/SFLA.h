@@ -9,7 +9,7 @@ SC_MODULE(SFLA) {
 	sc_fifo_in<Frog> frog_in;
 
 	std::vector<Frog> all_frogs;
-	
+    sc_event evolves_complte[NUMBER_OF_MEMPLEX];
 	sc_event received_frogs_event;
 	sc_event computed_fitness_event;
 	sc_event sorted_fitness_event;
