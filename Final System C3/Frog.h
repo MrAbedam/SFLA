@@ -40,7 +40,6 @@ struct Frog {
     }
 };
 
-// ** Overload the `<<` operator for `Frog` to support SystemC tracing and output **
 inline std::ostream& operator<<(std::ostream& os, const Frog& frog) {
     os << "Fitness: " << frog.fitness
         << ", Index: " << frog.allfrogs_index
@@ -50,7 +49,6 @@ inline std::ostream& operator<<(std::ostream& os, const Frog& frog) {
     return os;
 }
 
-// ** Custom `sc_trace` function for SystemC **
 inline void sc_trace(sc_trace_file* f, const Frog& frog, const std::string& name) {
     sc_trace(f, frog.fitness, name + ".fitness");
     sc_trace(f, frog.allfrogs_index, name + ".allfrogs_index");

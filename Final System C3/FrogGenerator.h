@@ -3,7 +3,7 @@
 #include "Frog.h"
 
 SC_MODULE(FrogGenerator) {
-    sc_fifo_out<Frog> frog_out; // FIFO output for sending frogs
+    sc_fifo_out<Frog> frog_out;
 
     void generate_frogs();
 
