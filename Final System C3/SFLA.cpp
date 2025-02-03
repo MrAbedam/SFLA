@@ -15,13 +15,6 @@ std::vector<std::vector<Frog>> selected_frogs(NUMBER_OF_MEMPLEX);
 int UgFitnessChange = 10000; // more accurate to condiser sigma of all knapsack items
 Frog Ug;
 
-#define NUMBER_OF_FROGS 6
-#define NUMBER_OF_MEMPLEX 2
-#define NUMBER_OF_ITEMS 9
-#define Q_SELECTION 2
-#define L_MAX_ITERATION 2
-#define STEP_SIZE_MAX 1
-
 
 void SFLA::start() {
     cout << "\n                           PHASE 0 _ PARAMETERS";
@@ -30,16 +23,17 @@ void SFLA::start() {
     cout << "\nNUMBER_OF_ITEMS " << NUMBER_OF_ITEMS;
     cout << "\nQ_SELECTION " << Q_SELECTION;
     cout << "\nL_MAX_ITERATION " << L_MAX_ITERATION;
+    cout << "\nG_MAX_ITERATION " << G_MAX_ITERATION;
     cout << "\nSTEP_SIZE_MAX " << STEP_SIZE_MAX;
     cout << "\nEPSILON_CHANGE_UG " << EPSILON_CHANGE_UG;
     cout << "\n _______________________________________________________________";
     cout << "\n\n                 PHASE1 _ INIT FROGS, SET FITNESS AND SORT\n";
-
+    srand(time(0));
     receive_init_frogs();
     for (int i = 0; i < NUMBER_OF_FROGS; i++) {
         all_frogs[i].fitness = fitness_function(all_frogs[i].solution);
     }
-    fitness_sorter(all_frogs);
+    fitness_sorter(all_frogs, true);
     for (int i = 0; i < NUMBER_OF_FROGS; i++) {
         cout << "\nFitness:" << all_frogs[i].fitness << '\n';
         for (int j = 0; j < NUMBER_OF_ITEMS; ++j) {
@@ -53,7 +47,7 @@ void SFLA::start() {
     //GMAX FROM HERE
 
     for (int i = 0; i < G_MAX_ITERATION ; i++){
-        fitness_sorter(all_frogs);
+        fitness_sorter(all_frogs, true);
         Ug = all_frogs[0];
         memplex_partition();
 
@@ -69,7 +63,8 @@ void SFLA::start() {
         for (int i = 0; i < NUMBER_OF_MEMPLEX; i++) {
             sc_spawn(sc_bind(&SFLA::memplex_evolution, this, i));
         }
-        fitness_sorter(all_frogs);
+        wait(sc_time(1, SC_NS));
+        fitness_sorter(all_frogs, true);
         if (abs(Ug.fitness - all_frogs[0].fitness) <= EPSILON_CHANGE_UG){
             // Ug didnt change
         } else{
@@ -77,6 +72,7 @@ void SFLA::start() {
         }
         // if change set i to 0
         // if dont change i++
+        cout << "|||||||||||||||||||||||||||||| iteration "<< i<<'\n';
     }
 
     cout << "||||||||||||||||||||||||||||||\n";
@@ -91,7 +87,7 @@ void SFLA::start() {
 
 void SFLA::memplex_evolution(int memplex_id) {
     select_q_frogs(memplex_id);
-    fitness_sorter(selected_frogs[memplex_id]);
+    fitness_sorter(selected_frogs[memplex_id], false);
     evolution_frog(memplex_id);
 
     // Debugging output
@@ -205,13 +201,13 @@ bool SFLA::updateUwBasedOnUg(int selected_id) {
     int newFitness = fitness_function(newTestSolution);
 
 
-    cout << "\nUb fitness and solution: " << Ug.fitness << "  -  " << Ug.solution;
+    cout << "\nUg fitness and solution: " << Ug.fitness << "  -  " << Ug.solution;
     cout << "\nUw fitness and solution: " << Uw.fitness << "  -  " << Uw.solution;
     cout << "\nUWprime    and solution: " << newFitness << "  -  " << newTestSolution;
 
     if (newFitness > curFitness) {
         setupUwprime(selected_id, newTestSolution);
-        cout << "\n         UG USED BY MEMPLEX " << selected_id; 
+        cout << "\n         UG USED BY MEMPLEX " << selected_id << "\n";
         return true;
     }
     return false;
@@ -223,33 +219,37 @@ void SFLA::evolution_frog(int selected_id) {
     int current_iteration = 0;
 
     do {
-        fitness_sorter(selected_frogs[selected_id]);//selected_frogs[0] => Ub
-        fitness_sorter(all_frogs); //all_frogs[0] => Ug
+        fitness_sorter(selected_frogs[selected_id], false);//selected_frogs[0] => Ub
+        fitness_sorter(all_frogs, true); //all_frogs[0] => Ug
 
         Frog& Uw = selected_frogs[selected_id][Q_SELECTION - 1];
         cout << "\nold least is:" << Uw.fitness <<"  "<<Uw.solution << '\n';
         //part1 Uw and Ub
-        
+        cout << "//-----------------------------------------//\n";
         if (updateUwBasedOnUb(selected_id)) {
+            cout << "\n//-----------------------------------------//\n";
         }
-        
+
         //part2 Uw and Ug
         else if (updateUwBasedOnUg(selected_id)) {
+            cout << "\n//-----------------------------------------//\n";
         }
 
         //part3 Random
         else {
             for (int j = 0; j < NUMBER_OF_ITEMS; ++j) {
                 newSolution[j] = (rand()) % 2;
-                cout << "\n         RANDOM USED BY MEMPLEX: "<<selected_id;
-                setupUwprime(selected_id, newSolution);
             }
+            cout << "\n         RANDOM USED BY MEMPLEX: "<<selected_id;
+            setupUwprime(selected_id, newSolution);
         }
+        cout << "\n//-----------------------------------------//\n";
+
         current_iteration++;
-        fitness_sorter(all_frogs); // if we have to update ug each time
+        fitness_sorter(all_frogs, true); // if we have to update ug each time
         cout <<"\nUG FITNESS"<<Ug.fitness << "\n";
     } while (current_iteration <= L_MAX_ITERATION);
-    fitness_sorter(all_frogs);
+    fitness_sorter(all_frogs, false);
     //Alternate interp: set Ug = all_frogs[0] over here (just in case)
 }
 
@@ -258,7 +258,8 @@ void SFLA::setupUwprime(int selected_id, sc_bv<NUMBER_OF_ITEMS> &newSolution) {
 
     Uw.solution = newSolution;
     Uw.fitness = fitness_function(newSolution);
-    all_frogs[Uw.allfrogs_index] = Uw;
+    all_frogs[Uw.allfrogs_index].solution = newSolution;
+    all_frogs[Uw.allfrogs_index].fitness = Uw.fitness;
     cout << "\nNEW SOLUTION " << Uw.solution << " NEW FITNESS " << Uw.fitness;
 
 }
@@ -284,12 +285,14 @@ int SFLA::fitness_function(sc_bv<NUMBER_OF_ITEMS> solution) {
 }
 
 
-void SFLA::fitness_sorter(std::vector<Frog>& frogs) {
+void SFLA::fitness_sorter(std::vector<Frog>& frogs , bool isAllFrog) {
     std::sort(std::begin(frogs), std::end(frogs), [](const Frog& firstFrog, const Frog& secondFrog) {
         return firstFrog.fitness > secondFrog.fitness;
         });
-    for (int i = 0; i < NUMBER_OF_FROGS; i++) {
-        all_frogs[i].allfrogs_index = i;
+    if (isAllFrog){
+        for (int i = 0; i < NUMBER_OF_FROGS; i++) {
+            all_frogs[i].allfrogs_index = i;
+        }
     }
 //    Ug = all_frogs[0];
 }

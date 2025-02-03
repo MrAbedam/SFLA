@@ -21,7 +21,7 @@ SC_MODULE(SFLA) {
 	//void initial_frogs(); //soft
 
 	int fitness_function(sc_bv<NUMBER_OF_ITEMS> solution); //soft
-	void fitness_sorter(std::vector<Frog>&frogs); //hard
+	void fitness_sorter(std::vector<Frog>&frogs, bool isAllFrog); //hard
 	void start();
 	void memplex_partition();
 	void compute_selection_probabilities();
