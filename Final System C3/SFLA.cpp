@@ -1,4 +1,5 @@
 
+#pragma once
 #include "SFLA.h"
 #include <vector>
 #include <random>
@@ -16,7 +17,12 @@ Frog Ug;
 
 void SFLA::start() {
 
-    initial_frogs(); //soft
+
+    receive_frogs();
+
+    fitness_sorter(all_frogs);
+
+    //initial_frogs(); //soft
 
     for (int i = 0; i < NUMBER_OF_FROGS; i++) {
         all_frogs[i].fitness = fitness_function(all_frogs[i].solution);
@@ -70,6 +76,20 @@ int SFLA::hamming_distance(sc_bv<NUMBER_OF_ITEMS>& U1, sc_bv<NUMBER_OF_ITEMS>& U
         }
     }
     return distance;
+}
+
+void SFLA::receive_frogs() {
+    for (int i = 0; i < NUMBER_OF_FROGS; i++) {
+        Frog received_frog;
+        frog_in.read(received_frog); // Read frog from FIFO
+        all_frogs.push_back(received_frog);
+    }
+
+    // Debug: Print received frogs
+    std::cout << "Received Frogs:\n";
+    for (auto& frog : all_frogs) {
+        std::cout << "Frog Fitness: " << frog.fitness << " Solution: " << frog.solution << "\n";
+    }
 }
 
 bool SFLA::updateUwBasedOnUb(int selected_id) {
@@ -206,7 +226,7 @@ void SFLA::setupUwprime(int selected_id, sc_bv<NUMBER_OF_ITEMS> &newSolution) {
     cout << "\nNEW SOLUTION " << Uw.solution << " NEW FITNESS " << Uw.fitness;
 
 }
-
+/*
 void SFLA::initial_frogs() {
     srand(time(0)); //random seed init
     for (int i = 0; i < NUMBER_OF_FROGS; i++) {
@@ -217,7 +237,7 @@ void SFLA::initial_frogs() {
         curFrog.allfrogs_index = i;
         all_frogs.push_back(curFrog);
     }
-}
+}*/
 
 int SFLA::fitness_function(sc_bv<NUMBER_OF_ITEMS> solution) {
     int value[NUMBER_OF_ITEMS] = { 8, 6, 3, 7, 6, 9, 8, 5, 6 };

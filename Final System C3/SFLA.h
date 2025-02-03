@@ -1,3 +1,4 @@
+#pragma once
 #include "Frog.h"
 
 SC_MODULE(SFLA) {
@@ -5,8 +6,11 @@ SC_MODULE(SFLA) {
 	//sc_out<sc_bv<NUMBER_OF_ITEMS>> final_frog_answer;
 	//Frog all_frogs[NUMBER_OF_FROGS];
 
+	sc_fifo_in<Frog> frog_in; // FIFO input to receive frogs
+
 	std::vector<Frog> all_frogs;
 	
+	void receive_frogs();
 
 	void initial_frogs(); //soft
 
@@ -35,7 +39,6 @@ SC_MODULE(SFLA) {
 
 
 	SC_CTOR(SFLA) {
-		SC_METHOD(start);
-		all_frogs.reserve(NUMBER_OF_FROGS);
+		SC_THREAD(receive_frogs);
 	}
 };

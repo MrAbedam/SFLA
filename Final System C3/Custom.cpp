@@ -1,3 +1,4 @@
+/*
 #include <systemc.h>
 #include <ostream>
 
@@ -88,4 +89,4 @@ int sc_main(int, char* []) {
     SFLA module("module");
     sc_start(10, SC_SEC);
     return 0;
-}
+}*/

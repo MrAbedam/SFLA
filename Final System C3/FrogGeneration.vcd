@@ -1,0 +1,90 @@
+$date
+     Feb 03, 2025       17:22:30
+$end
+
+$version
+ SystemC 3.0.1-Accellera --- Oct 30 2024 17:09:42
+$end
+
+$timescale
+     1 ps
+$end
+
+$scope module SystemC $end
+$var wire    1  aaaan  ValidOutput       $end
+$scope module FrogSignal $end
+$var wire   32  aaaaa  fitness [31:0]  $end
+$var wire   32  aaaab  allfrogs_index [31:0]  $end
+$var wire   32  aaaac  memplex_index [31:0]  $end
+$var wire   32  aaaad  memplex_offset [31:0]  $end
+$var wire    1  aaaae  solution(0)       $end
+$var wire    1  aaaaf  solution(1)       $end
+$var wire    1  aaaag  solution(2)       $end
+$var wire    1  aaaah  solution(3)       $end
+$var wire    1  aaaai  solution(4)       $end
+$var wire    1  aaaaj  solution(5)       $end
+$var wire    1  aaaak  solution(6)       $end
+$var wire    1  aaaal  solution(7)       $end
+$var wire    1  aaaam  solution(8)       $end
+$upscope $end
+$upscope $end
+$enddefinitions  $end
+
+$comment
+All initial values are dumped below at time 0 sec = 0 timescale units.
+$end
+
+$dumpvars
+b0 aaaaa
+b0 aaaab
+b0 aaaac
+b0 aaaad
+?aaaae
+?aaaaf
+?aaaag
+?aaaah
+?aaaai
+?aaaaj
+?aaaak
+?aaaal
+?aaaam
+1aaaan
+$end
+
+#10000
+b1 aaaab
+
+#20000
+b10 aaaab
+
+#30000
+b11 aaaab
+
+#40000
+b100 aaaab
+
+#50000
+b101 aaaab
+
+#60000
+b110 aaaab
+
+#70000
+b111 aaaab
+
+#80000
+b1000 aaaab
+
+#90000
+b1001 aaaab
+
+#100000
+b1010 aaaab
+
+#110000
+b1011 aaaab
+
+#120000
+0aaaan
+
+#200000
