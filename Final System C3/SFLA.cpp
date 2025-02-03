@@ -297,7 +297,7 @@ void SFLA::fitness_sorter(std::vector<Frog>& frogs , bool isAllFrog) {
 
 
 
-
+// TODO
 void SFLA::memplex_partition() {
     for (auto& memplex : memplexes) {
         memplex.clear();
@@ -355,7 +355,7 @@ void SFLA::select_q_frogs(int memplex_id) {
     bool selected[NUMBER_OF_FROGS / NUMBER_OF_MEMPLEX] = { false };
 
     std::cout << "Selected frogs from Memplex " << memplex_id << ": ";
-
+    selected_frogs[memplex_id].clear();
     for (int i = 0; i < Q_SELECTION; i++) {
         int selected_index;
         do {
