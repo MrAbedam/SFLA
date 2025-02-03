@@ -6,6 +6,8 @@
 #define NUMBER_OF_ITEMS 9
 #define Q_SELECTION 3
 #define L_MAX_ITERATION 10
+#define G_MAX_ITERATION 10
+#define EPSILON_CHANGE_UG 0
 #define STEP_SIZE_MAX 1
 
 struct Frog {

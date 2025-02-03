@@ -37,4 +37,6 @@ SC_MODULE(SFLA) {
 	SC_CTOR(SFLA) {
 		SC_THREAD(start);
 	}
+
+    void memplex_evolution(int memplex_id);
 };
