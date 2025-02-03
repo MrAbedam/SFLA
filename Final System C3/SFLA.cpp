@@ -3,6 +3,7 @@
 #include "SFLA.h"
 #include <vector>
 #include <random>
+#include "FitnessGenerator.h"
 
 
 std::vector<std::vector<Frog>> memplexes(NUMBER_OF_MEMPLEX);
@@ -17,61 +18,82 @@ Frog Ug;
 
 void SFLA::start() {
     cout << "ALGO STARTED";
-    receive_init_frogs();
+    //Initial each frog
+    receive_all_frogs(frog_in_from_gen);
+
+    // send to fitness to calculate it
+    send_all_frogs(frog_from_SFLA_to_fit);
+
+    //receive from fitGen
+    receive_all_frogs(frog_from_fit_to_SFLA);
 
     fitness_sorter(all_frogs);
 
-
     for (int i = 0; i < NUMBER_OF_FROGS; i++) {
-        all_frogs[i].fitness = fitness_function(all_frogs[i].solution);
-    }
-
-    fitness_sorter(all_frogs);
-
-    for (int i = 0; i < NUMBER_OF_FROGS; i++) {
-        cout << "\nFitness:" << all_frogs[i].fitness << '\n';
+        cout << "Fitness:" << all_frogs[i].fitness << '\n';
         for (int j = 0; j < NUMBER_OF_ITEMS; ++j) {
             cout << all_frogs[i].solution[j] << " ";
         }
         cout << '\n';
     }
+//    for (int i = 0; i < NUMBER_OF_FROGS; i++) {
+//        all_frogs[i].fitness = FitnessGenerator::fitness_function(all_frogs[i].solution);
+//    }
 
-    cout << '\n';
-
-
-    //GMAX FROM HERE
-
-    Ug = all_frogs[0];
-    fitness_sorter(all_frogs);
-    memplex_partition();
-
-    compute_selection_probabilities();
-    
-
-    //--------- Paralel for all i's
-    select_q_frogs(0);
-    fitness_sorter(selected_frogs[0]);
-    //---------------------------------
-    evolution_frog(0);
-    for (int i = 0; i < NUMBER_OF_FROGS; i++) {
-        //cout << "\nIndex:" << all_frogs[i].frog_index << "\nFitness:" << all_frogs[i].fitness << '\n';
-        cout << "\nFitness:" << all_frogs[i].fitness << '\n';
-        for (int j = 0; j < NUMBER_OF_ITEMS; ++j) {
-            cout << all_frogs[i].solution[j] << " ";
-        }
-        cout << '\n';
-    }
-
-    //EVOLVE
+//
+//    fitness_sorter(all_frogs);
+//
+//    for (int i = 0; i < NUMBER_OF_FROGS; i++) {
+//        cout << "\nFitness:" << all_frogs[i].fitness << '\n';
+//        for (int j = 0; j < NUMBER_OF_ITEMS; ++j) {
+//            cout << all_frogs[i].solution[j] << " ";
+//        }
+//        cout << '\n';
+//    }
+//
+//    cout << '\n';
+//
+//
+//    //GMAX FROM HERE
+//
+//    Ug = all_frogs[0];
+//    fitness_sorter(all_frogs);
+//    memplex_partition();
+//
+//    compute_selection_probabilities();
+//
+//
+//    //--------- Paralel for all i's
+//    select_q_frogs(0);
+//    fitness_sorter(selected_frogs[0]);
+//    //---------------------------------
+//    evolution_frog(0);
+//    for (int i = 0; i < NUMBER_OF_FROGS; i++) {
+//        //cout << "\nIndex:" << all_frogs[i].frog_index << "\nFitness:" << all_frogs[i].fitness << '\n';
+//        cout << "\nFitness:" << all_frogs[i].fitness << '\n';
+//        for (int j = 0; j < NUMBER_OF_ITEMS; ++j) {
+//            cout << all_frogs[i].solution[j] << " ";
+//        }
+//        cout << '\n';
+//    }
+//
+//    //EVOLVE
 }
 
 
 
-void SFLA::receive_init_frogs() {
+void SFLA::receive_all_frogs(sc_fifo_in<Frog> input_ch) {
+    all_frogs.clear();
     for (int i = 0; i < NUMBER_OF_FROGS; i++) {
         Frog received_frog;
-        frog_in.read(received_frog); // Read frog from FIFO
+        input_ch.read(received_frog); // Read frog from FIFO
         all_frogs.push_back(received_frog);
+    }
+}
+
+void SFLA::send_all_frogs(sc_fifo_out<Frog> out_ch) {
+    for (int i = 0; i < NUMBER_OF_FROGS; i++) {
+        out_ch.write(all_frogs[i]);
     }
 }
 
@@ -117,7 +139,7 @@ bool SFLA::updateUwBasedOnUb(int selected_id) {
         }
     }
 
-    int newFitness = fitness_function(newTestSolution);
+    int newFitness = 0; //fitness_function(newTestSolution);
 
 
     cout << "\nUb fitness and solution: " << Ub.fitness << "  -  " << Ub.solution;
@@ -162,7 +184,7 @@ bool SFLA::updateUwBasedOnUg(int selected_id) {
         }
     }
 
-    int newFitness = fitness_function(newTestSolution);
+    int newFitness = 0;//fitness_function(newTestSolution);
 
 
     cout << "\nUb fitness and solution: " << Ug.fitness << "  -  " << Ug.solution;
@@ -216,31 +238,31 @@ void SFLA::setupUwprime(int selected_id, sc_bv<NUMBER_OF_ITEMS> &newSolution) {
     Frog& Uw = selected_frogs[selected_id][Q_SELECTION - 1];
 
     Uw.solution = newSolution;
-    Uw.fitness = fitness_function(newSolution);
+    Uw.fitness = 0;//fitness_function(newSolution);
     all_frogs[Uw.allfrogs_index] = Uw;
     cout << "\nNEW SOLUTION " << Uw.solution << " NEW FITNESS " << Uw.fitness;
 
 }
 
-int SFLA::fitness_function(sc_bv<NUMBER_OF_ITEMS> solution) {
-    int value[NUMBER_OF_ITEMS] = { 8, 6, 3, 7, 6, 9, 8, 5, 6 };
-    int weight[NUMBER_OF_ITEMS] = { 5, 4, 3, 9, 5, 7, 6, 3, 2 };
-    int weight_limit = 20;
-    int total_value = 0;
-    int total_weight = 0;
-    for (int i = 0; i < NUMBER_OF_ITEMS; i++) {
-        if (solution[i] == 1) {
-            total_value += value[i];
-            total_weight += weight[i];
-        }
-    }
-    if (total_weight > weight_limit) {
-        return -1;
-    }
-    else {
-        return total_value;
-    }
-}
+//int SFLA::fitness_function(sc_bv<NUMBER_OF_ITEMS> solution) {
+//    int value[NUMBER_OF_ITEMS] = { 8, 6, 3, 7, 6, 9, 8, 5, 6 };
+//    int weight[NUMBER_OF_ITEMS] = { 5, 4, 3, 9, 5, 7, 6, 3, 2 };
+//    int weight_limit = 20;
+//    int total_value = 0;
+//    int total_weight = 0;
+//    for (int i = 0; i < NUMBER_OF_ITEMS; i++) {
+//        if (solution[i] == 1) {
+//            total_value += value[i];
+//            total_weight += weight[i];
+//        }
+//    }
+//    if (total_weight > weight_limit) {
+//        return -1;
+//    }
+//    else {
+//        return total_value;
+//    }
+//}
 
 
 void SFLA::fitness_sorter(std::vector<Frog>& frogs) {

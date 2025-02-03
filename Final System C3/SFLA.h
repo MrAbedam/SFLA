@@ -6,7 +6,10 @@ SC_MODULE(SFLA) {
 	//sc_out<sc_bv<NUMBER_OF_ITEMS>> final_frog_answer;
 	//Frog all_frogs[NUMBER_OF_FROGS];
 
-	sc_fifo_in<Frog> frog_in;
+	sc_fifo_in<Frog> frog_in_from_gen;
+
+    sc_fifo_out<Frog> frog_from_SFLA_to_fit;
+    sc_fifo_in<Frog> frog_from_fit_to_SFLA;
 
 	std::vector<Frog> all_frogs;
 	
@@ -20,7 +23,7 @@ SC_MODULE(SFLA) {
 
 	//void initial_frogs(); //soft
 
-	int fitness_function(sc_bv<NUMBER_OF_ITEMS> solution); //soft
+//	int fitness_function(sc_bv<NUMBER_OF_ITEMS> solution); //soft
 	void fitness_sorter(std::vector<Frog>&frogs); //hard
 	void start();
 	void memplex_partition();
@@ -31,10 +34,12 @@ SC_MODULE(SFLA) {
 	bool updateUwBasedOnUb(int selected_id);
 	bool updateUwBasedOnUg(int selected_id);
 	void setupUwprime(int selected_id, sc_bv<NUMBER_OF_ITEMS> &newSolution);
-	void receive_init_frogs();
+	void receive_all_frogs(sc_fifo_in<Frog> input);
+    void send_all_frogs(sc_fifo_out<Frog> out_ch);
 
 
 	SC_CTOR(SFLA) {
 		SC_THREAD(start);
 	}
+
 };
