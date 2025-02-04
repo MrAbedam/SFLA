@@ -35,11 +35,11 @@ void SFLA::start() {
     receive_init_frogs();
     wait(controller.frogs_received_event);
     //frogs has been received
-    send_to_fitness(); //triggers sent to fitness 
+    send_to_fitness(all_frogs); //triggers sent to fitness 
     wait(controller.fitness_done_event);
 
     //all frogs have fitness and are ready to be received
-    receive_fitness();
+    receive_fitness(all_frogs);
     wait(controller.fitness_received_event);
 
     cout << "\n\n\nHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n";
@@ -112,14 +112,14 @@ void SFLA::start() {
     //EVOLVE
 }
 
-void SFLA::send_to_fitness() {
+void SFLA::send_to_fitness(std::vector<Frog> all_frogs) {
     for (int i = 0; i < NUMBER_OF_FROGS; i++) {
         solution_out.write(all_frogs[i].solution);
     }
     controller.frogs_sent_to_fitness.notify();
 }
 
-void SFLA::receive_fitness() {
+void SFLA::receive_fitness(std::vector<Frog> all_frogs) {
     for (int i = 0; i < NUMBER_OF_FROGS; i++) {
         int computed_fitness;
         fitness_in.read(computed_fitness);

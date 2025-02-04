@@ -137,6 +137,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Controller.cpp" />
+    <ClCompile Include="FitnessEvaluator.cpp" />
     <ClCompile Include="FrogGenerator.cpp" />
     <ClCompile Include="SFLA.cpp" />
     <ClCompile Include="main.cpp" />
