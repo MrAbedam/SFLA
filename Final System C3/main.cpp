@@ -3,6 +3,7 @@
 #include "SFLA.h"
 #include "FrogGenerator.h"
 #include "FitnessEvaluator.h"
+#include "MemplexPartition.h"
 #include "Controller.h"
 
 int sc_main(int argc, char* argv[]) {
@@ -10,13 +11,14 @@ int sc_main(int argc, char* argv[]) {
     sc_fifo<Frog> frog_fifo(10);
 
     //fitness eval
-    sc_fifo<sc_bv<NUMBER_OF_ITEMS>> solution_fifo(10);
-    sc_fifo<int> fitness_fifo(10);
+    sc_fifo<sc_bv<NUMBER_OF_ITEMS>> solution_fifo(NUMBER_OF_FROGS);
+    sc_fifo<int> fitness_fifo(NUMBER_OF_FROGS);
 
 
     FrogGenerator frogGen("frogGen");
     FitnessEvaluator fitnessEval("fitnessEval");
     SFLA mySFLA("mySFLA");
+    //MemplexPartition myMemp("mymemp");
 
     frogGen.frog_out(frog_fifo);
     mySFLA.frog_in(frog_fifo);
@@ -26,6 +28,8 @@ int sc_main(int argc, char* argv[]) {
 
     fitnessEval.fitness_out(fitness_fifo);
     mySFLA.fitness_in(fitness_fifo);
+
+    
 
 
     sc_start(10, SC_SEC);

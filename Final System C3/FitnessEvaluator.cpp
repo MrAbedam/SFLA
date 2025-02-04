@@ -4,27 +4,64 @@
 #include <ctime>
 #include "Controller.h"
 
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <vector>
+
+
 void FitnessEvaluator::compute_fitness() {
     wait(controller.frogs_sent_to_fitness);
+
+
+    std::ifstream file("items_data.txt");
+    std::string line;
+
+    if (file.is_open()) {
+        while (getline(file, line)) {
+            std::stringstream ss(line);
+            std::string label;
+            ss >> label;
+
+            if (label == "Values:") {
+                int v;
+                while (ss >> v) controller.value.push_back(v);
+            }
+            else if (label == "Weights:") {
+                int w;
+                while (ss >> w) controller.weight.push_back(w);
+            }
+            else if (label == "Weight_Limit:") {
+                ss >> controller.weight_limit;
+            }
+        }
+        file.close();
+    }
+    else {
+        std::cerr << "Error: Unable to open file!" << std::endl;
+        return;
+    }
+
+    if (controller.value.size() != controller.weight.size()) {
+        std::cerr << "Error: Mismatch in value and weight sizes!" << std::endl;
+        return;
+    }
+
     for (int i = 0; i < NUMBER_OF_FROGS; i++) {
         sc_bv<NUMBER_OF_ITEMS> solution;
         solution_in.read(solution);
 
-
-        int value[NUMBER_OF_ITEMS] = { 8, 6, 3, 7, 6, 9, 8, 5, 6 };
-        int weight[NUMBER_OF_ITEMS] = { 5, 4, 3, 9, 5, 7, 6, 3, 2 };
-        int weight_limit = 20;
         int total_value = 0, total_weight = 0;
-
-        for (int i = 0; i < NUMBER_OF_ITEMS; i++) {
-            if (solution[i] == 1) {
-                total_value += value[i];
-                total_weight += weight[i];
+        for (int j = 0; j < NUMBER_OF_ITEMS; j++) {
+            if (solution[j] == 1) {
+                total_value += controller.value[j];
+                total_weight += controller.weight[j];
             }
         }
-
-        int fitness = (total_weight > weight_limit) ? -1 : total_value;
+       
+        int fitness = (total_weight > controller.weight_limit) ? -1 : total_value;
         fitness_out.write(fitness);
     }
+
     controller.fitness_done_event.notify();
 }

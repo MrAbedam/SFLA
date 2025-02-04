@@ -13,9 +13,14 @@ SC_MODULE(SFLA) {
 	sc_fifo_out<sc_bv<NUMBER_OF_ITEMS>> solution_out; // Sending solutions to FitnessEvaluator
 	sc_fifo_in<int> fitness_in; // Receiving fitness values from FitnessEvaluator
 
+
+
 	void send_to_fitness(std::vector<Frog> &all_frogs);
 	void receive_fitness(std::vector<Frog> &all_frogs);
 
+
+	//void send_to_memplex_partition();
+	//void receive_from_memplex_partition();
 
 	std::vector<Frog> all_frogs;
     sc_event evolves_complte[NUMBER_OF_MEMPLEX];

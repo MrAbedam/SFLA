@@ -30,6 +30,12 @@
     <ClCompile Include="FitnessEvaluator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MemplexPartition.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MemplexPartition.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SFLA.h">
