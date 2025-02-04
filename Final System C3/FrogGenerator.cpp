@@ -1,8 +1,8 @@
 #pragma once
 #include "FrogGenerator.h"
-#include "SFLA.h"
 #include <cstdlib>
 #include <ctime>
+#include "Controller.h"
 
 void FrogGenerator::generate_frogs() {
     srand(time(0)); 
@@ -15,5 +15,5 @@ void FrogGenerator::generate_frogs() {
         curFrog.allfrogs_index = i;
         frog_out.write(curFrog);
     }
-
+    controller.generated_frogs_event.notify(SC_ZERO_TIME);
 }

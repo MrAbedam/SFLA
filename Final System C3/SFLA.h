@@ -1,5 +1,7 @@
 #pragma once
 #include "Frog.h"
+#include "Controller.h"
+
 
 SC_MODULE(SFLA) {
 	//sc_out<bool> valid_output;
@@ -8,9 +10,15 @@ SC_MODULE(SFLA) {
 
 	sc_fifo_in<Frog> frog_in;
 
+	sc_fifo_out<sc_bv<NUMBER_OF_ITEMS>> solution_out; // Sending solutions to FitnessEvaluator
+	sc_fifo_in<int> fitness_in; // Receiving fitness values from FitnessEvaluator
+
+	void send_to_fitness();
+	void receive_fitness();
+
+
 	std::vector<Frog> all_frogs;
     sc_event evolves_complte[NUMBER_OF_MEMPLEX];
-	sc_event received_frogs_event;
 	sc_event computed_fitness_event;
 	sc_event sorted_fitness_event;
 	sc_event partitioned_memplex_event;
@@ -19,6 +27,8 @@ SC_MODULE(SFLA) {
 
 
 	//void initial_frogs(); //soft
+
+
 
 	int fitness_function(sc_bv<NUMBER_OF_ITEMS> solution); //soft
 	void fitness_sorter(std::vector<Frog>&frogs, bool isAllFrog); //hard
@@ -33,10 +43,10 @@ SC_MODULE(SFLA) {
 	void setupUwprime(int selected_id, sc_bv<NUMBER_OF_ITEMS> &newSolution);
 	void receive_init_frogs();
 
+	void memplex_evolution(int memplex_id);
 
 	SC_CTOR(SFLA) {
 		SC_THREAD(start);
 	}
 
-    void memplex_evolution(int memplex_id);
 };

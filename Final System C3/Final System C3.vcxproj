@@ -136,11 +136,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Controller.cpp" />
     <ClCompile Include="FrogGenerator.cpp" />
     <ClCompile Include="SFLA.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Controller.h" />
+    <ClInclude Include="FitnessEvaluator.h" />
     <ClInclude Include="Frog.h" />
     <ClInclude Include="FrogGenerator.h" />
     <ClInclude Include="SFLA.h" />

@@ -29,10 +29,38 @@ void SFLA::start() {
     cout << "\n _______________________________________________________________";
     cout << "\n\n                 PHASE1 _ INIT FROGS, SET FITNESS AND SORT\n";
     srand(time(0));
+
+    //generate and receive frogs
+    wait(controller.generated_frogs_event);
     receive_init_frogs();
+    wait(controller.frogs_received_event);
+    //frogs has been received
+    send_to_fitness(); //triggers sent to fitness 
+    wait(controller.fitness_done_event);
+
+    //all frogs have fitness and are ready to be received
+    receive_fitness();
+    wait(controller.fitness_received_event);
+
+    cout << "\n\n\nHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n";
+
     for (int i = 0; i < NUMBER_OF_FROGS; i++) {
-        all_frogs[i].fitness = fitness_function(all_frogs[i].solution);
+        cout << all_frogs[i].fitness << "        " << all_frogs[i].solution<<'\n';
     }
+
+
+    cout << "HAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n\n\n";
+
+
+    for (int i = 0; i < NUMBER_OF_FROGS; i++) {
+        cout << all_frogs[i].fitness << "    ";
+    }
+
+    //felan ta modulate beshe
+    /*for (int i = 0; i < NUMBER_OF_FROGS; i++) {
+        all_frogs[i].fitness = fitness_function(all_frogs[i].solution);
+    }*/
+
     fitness_sorter(all_frogs, true);
     for (int i = 0; i < NUMBER_OF_FROGS; i++) {
         cout << "\nFitness:" << all_frogs[i].fitness << '\n';
@@ -63,6 +91,7 @@ void SFLA::start() {
         for (int i = 0; i < NUMBER_OF_MEMPLEX; i++) {
             sc_spawn(sc_bind(&SFLA::memplex_evolution, this, i));
         }
+
         wait(evolves_complte[0] & evolves_complte[1]);
         fitness_sorter(all_frogs, true);
         if (abs(Ug.fitness - all_frogs[0].fitness) <= EPSILON_CHANGE_UG){
@@ -83,6 +112,21 @@ void SFLA::start() {
     //EVOLVE
 }
 
+void SFLA::send_to_fitness() {
+    for (int i = 0; i < NUMBER_OF_FROGS; i++) {
+        solution_out.write(all_frogs[i].solution);
+    }
+    controller.frogs_sent_to_fitness.notify();
+}
+
+void SFLA::receive_fitness() {
+    for (int i = 0; i < NUMBER_OF_FROGS; i++) {
+        int computed_fitness;
+        fitness_in.read(computed_fitness);
+        all_frogs[i].fitness = computed_fitness;
+    }
+    controller.fitness_received_event.notify(SC_ZERO_TIME);
+}
 
 
 void SFLA::memplex_evolution(int memplex_id) {
@@ -110,6 +154,7 @@ void SFLA::receive_init_frogs() {
         frog_in.read(received_frog); // Read frog from FIFO
         all_frogs.push_back(received_frog);
     }
+    controller.frogs_received_event.notify(SC_ZERO_TIME);
 }
 
 
