@@ -55,11 +55,8 @@ void SFLA::start() {
     for (int i = 0; i < NUMBER_OF_FROGS; i++) {
         cout << all_frogs[i].fitness << "    ";
     }
-
-    //felan ta modulate beshe
-    /*for (int i = 0; i < NUMBER_OF_FROGS; i++) {
-        all_frogs[i].fitness = fitness_function(all_frogs[i].solution);
-    }*/
+    
+    //modulated till here
 
     fitness_sorter(all_frogs, true);
     for (int i = 0; i < NUMBER_OF_FROGS; i++) {
@@ -112,14 +109,14 @@ void SFLA::start() {
     //EVOLVE
 }
 
-void SFLA::send_to_fitness(std::vector<Frog> all_frogs) {
+void SFLA::send_to_fitness(std::vector<Frog> &all_frogs) {
     for (int i = 0; i < NUMBER_OF_FROGS; i++) {
         solution_out.write(all_frogs[i].solution);
     }
     controller.frogs_sent_to_fitness.notify();
 }
 
-void SFLA::receive_fitness(std::vector<Frog> all_frogs) {
+void SFLA::receive_fitness(std::vector<Frog> &all_frogs) {
     for (int i = 0; i < NUMBER_OF_FROGS; i++) {
         int computed_fitness;
         fitness_in.read(computed_fitness);
