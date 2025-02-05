@@ -4,6 +4,7 @@
 #include "FrogGenerator.h"
 #include "FitnessEvaluator.h"
 #include "monitor.h"
+#include "ProbabilityCalculator.h"
 
 int sc_main(int argc, char* argv[]) {
     //initial pop
@@ -15,15 +16,19 @@ int sc_main(int argc, char* argv[]) {
     sc_fifo<Frog> sfla_to_ev(NUMBER_OF_FROGS);
     sc_fifo<Frog> ev_to_sfla(NUMBER_OF_FROGS);
     sc_fifo<double> sfla_to_ev_prb(NUMBER_OF_FROGS/NUMBER_OF_MEMPLEX);
+    sc_fifo<double> probability_channel;
 
     sc_signal<Frog> frogFinalResult;
     sc_signal<bool> isFinalResult;
+    sc_signal<int>  probabilty_size;
 
     EvolutionModule evolutionModule("evolution");
     FrogGenerator frogGen("frogGen");
     FitnessEvaluator fitnessEval("fitnessEval");
+    ProbabilityCalculator probCalc("probCalc");
     SFLA sfla("sfla");
     monitor monitor("monitorFinalResult");
+
 
     frogGen.frog_out(frog_fifo);
     sfla.frog_in(frog_fifo);
@@ -33,6 +38,13 @@ int sc_main(int argc, char* argv[]) {
 
     fitnessEval.fitness_out(fitness_fifo);
     sfla.fitness_in(fitness_fifo);
+
+    //connect
+    sfla.probability_channel_in(probability_channel);
+    probCalc.probability_channel_out(probability_channel);
+    sfla.probability_size(probabilty_size);
+    probCalc.probability_size(probabilty_size);
+    
 
     sfla.send_to_evolve(sfla_to_ev);
     evolutionModule.receive_form_SFLA(sfla_to_ev);

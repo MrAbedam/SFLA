@@ -11,22 +11,24 @@ void SFLA::start() {
     cout << "\n\n                 PHASE1 _ INIT FROGS, SET FITNESS AND SORT\n";
     communicateWithSolutionGenerator();
     communicateWithFitnessCal();
+    fitness_sorter(all_frogs, true);
+    printAllFrog(false);
 
     cout << "_______________________________________________________________\n"
-         << "                   PHASE2 _ MEMPLEX PARTITION\n\n";
+        << "                   PHASE2 _ SHARED PROBABILITES CALCULCATION\n";
+    communicateWithProbCalc();
 
     ///G MAX FROM HERE
     for (int i = 0; i < G_MAX_ITERATION; i++) {
         fitness_sorter(all_frogs, true);
         Ug = all_frogs[0];
 
+        cout
+            << "_______________________________________________________________\n"
+            << "                   PHASE3 _ MEMPLEX PARTITION\n";
         memplex_partition();
         printAllFrog(true);
 
-        cout
-                << "_______________________________________________________________\n"
-                << "                   PHASE3 _ PROBABILITY CALCULATION\n";
-        compute_selection_probabilities();
 
         cout
                 << "_______________________________________________________________\n"
@@ -47,6 +49,28 @@ void SFLA::start() {
     isFinalResult->write(true);
     frogSolution.write(Ug);
 
+}
+
+void SFLA::communicateWithProbCalc() {
+    send_allData_to_selection_prob();
+    wait(controller.probability_done);
+    receive_allData_from_selection_prob();
+    wait(controller.probability_received);
+}
+
+void SFLA::send_allData_to_selection_prob() {
+    int n = NUMBER_OF_FROGS / NUMBER_OF_MEMPLEX;
+    probability_size->write(n);//size = size of each memplex
+}
+
+void SFLA::receive_allData_from_selection_prob() {
+    selection_probabilities.clear();
+    for (int i = 0; i < NUMBER_OF_FROGS / NUMBER_OF_MEMPLEX;i++) {
+        double curProb;
+        probability_channel_in.read(curProb);
+        selection_probabilities.push_back(curProb);
+    }
+    controller.probability_received.notify(SC_ZERO_TIME);
 }
 
 void SFLA::communicateWithEvolution() {///EVOLUTION CALCULATOR MODULE
@@ -182,7 +206,7 @@ void SFLA::memplex_partition() {
 }
 
 // TODO Create modules for this method
-void SFLA::compute_selection_probabilities() {
+/*void SFLA::compute_selection_probabilities() {
     int n = NUMBER_OF_FROGS / NUMBER_OF_MEMPLEX; // size of each memplex
 
     selection_probabilities.clear();
@@ -202,7 +226,7 @@ void SFLA::compute_selection_probabilities() {
         cout << p << " ";
     }
     cout << '\n';
-}
+}*/
 
 
 void SFLA::printAllFrog(bool memplexNeeded) {

@@ -20,10 +20,13 @@ SC_MODULE(SFLA) {
     sc_fifo_out<sc_bv<NUMBER_OF_ITEMS>> solution_out; // Sending solutions to FitnessEvaluator
     sc_fifo_in<int> fitness_in; // Receiving fitness values from FitnessEvaluator
 
+    //Connect to Probability
+    sc_out<int> probability_size;
+    sc_fifo_in<double> probability_channel_in;
+
     //Connect to Evolution
     sc_fifo_out<Frog> send_to_evolve;
     sc_fifo_out<double> send_probs_to_evolve;
-
     sc_fifo_in<Frog> receive_from_evolve;
 
     //Connect to monitor
@@ -42,7 +45,11 @@ SC_MODULE(SFLA) {
 
     void memplex_partition();
 
-    void compute_selection_probabilities();
+    void send_allData_to_selection_prob();//tbd
+
+    //void compute_selection_probabilities();//should be removed after
+
+    void receive_allData_from_selection_prob();//tbd
 
     void send_allData_to_evolve();
 
@@ -61,4 +68,6 @@ SC_MODULE(SFLA) {
     void communicateWithFitnessCal();
 
     void communicateWithEvolution();
+
+    void communicateWithProbCalc();
 };

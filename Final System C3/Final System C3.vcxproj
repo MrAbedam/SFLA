@@ -140,8 +140,7 @@
     <ClCompile Include="EvolutionModule.cpp" />
     <ClCompile Include="FitnessEvaluator.cpp" />
     <ClCompile Include="FrogGenerator.cpp" />
-    <ClCompile Include="MemplexPartition.cpp" />
-    <ClCompile Include="MemplexPartition.h" />
+    <ClCompile Include="ProbabilityCalculator.cpp" />
     <ClCompile Include="SFLA.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
@@ -151,6 +150,8 @@
     <ClInclude Include="FitnessEvaluator.h" />
     <ClInclude Include="Frog.h" />
     <ClInclude Include="FrogGenerator.h" />
+    <ClInclude Include="monitor.h" />
+    <ClInclude Include="ProbabilityCalculator.h" />
     <ClInclude Include="SFLA.h" />
   </ItemGroup>
   <ItemGroup>

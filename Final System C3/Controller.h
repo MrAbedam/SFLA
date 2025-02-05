@@ -10,6 +10,8 @@ public:
 	sc_event fitness_done_event;//fitness calculated and sent From FitnessEval to SFLA
 	sc_event fitness_received_event;//fitness received from FitnessEval in SFLA
 
+	sc_event probability_done;
+	sc_event probability_received;
 
 
     sc_event SFLA_send_data_to_EVOLV; //fitness received from FitnessEval in SFLA
@@ -20,7 +22,7 @@ public:
     sc_event SFLA_read_EV_data_DONE;
 
     // connection sfla , evole :
-//    sc_fifo<int> ev_to_sfla;
+	// sc_fifo<int> ev_to_sfla;
 
 
 	sc_event frogs_sent_to_memplex; //frogs sent to memplex;
