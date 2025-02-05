@@ -26,6 +26,9 @@ SC_MODULE(SFLA) {
 
     sc_fifo_in<Frog> receive_from_evolve;
 
+    //Connect to monitor
+    sc_out<Frog> frogSolution;
+    sc_out<bool> isFinalResult;
 
     void start();
 

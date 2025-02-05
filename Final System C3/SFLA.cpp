@@ -44,10 +44,8 @@ void SFLA::start() {
         cout << "||||||||| iteration " << i  << " ||||||||| " << '\n';
     }
 
-    cout << "||||||||||||||||||||||||||||||||||||\n";
-    cout << "||||||||| Final Solution |||||||||||\n";
-    cout << "          " <<Ug.fitness << " " << Ug.solution << endl;
-    cout << "||||||||||||||||||||||||||||||||||||\n";
+    isFinalResult->write(true);
+    frogSolution.write(Ug);
 
 }
 
