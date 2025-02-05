@@ -3,7 +3,7 @@
 
 #include "SFLA.h"
 #include <vector>
-
+#include <fstream>
 
 void SFLA::start() {
     logProblemInfo();
@@ -13,7 +13,7 @@ void SFLA::start() {
     communicateWithFitnessCal();
     fitness_sorter(all_frogs, true);
     printAllFrog(false);
-
+    Us = all_frogs[0];//set initial best answer
     cout << "_______________________________________________________________\n"
         << "                   PHASE2 _ SHARED PROBABILITES CALCULCATION\n";
     communicateWithProbCalc();
@@ -48,8 +48,36 @@ void SFLA::start() {
     Ug = all_frogs[0];
     isFinalResult->write(true);
     frogSolution.write(Ug);
-
+    save_solutions_to_file(Ug, Us);
 }
+
+void SFLA::save_solutions_to_file(const Frog& Ug, const Frog& Us) {
+    std::ofstream outfile("solution_comparison.txt");
+
+    if (!outfile) {
+        std::cerr << "Error opening file for writing!\n";
+        return;
+    }
+
+    outfile << "Ug Fitness: " << Ug.fitness << std::endl;
+    outfile << "Us Fitness: " << Us.fitness << std::endl;
+
+    outfile << "Ug Solution: ";
+    for (int i = 0; i < NUMBER_OF_ITEMS; i++) {
+        outfile << Ug.solution[i];
+    }
+    outfile << std::endl;
+
+    outfile << "Us Solution: ";
+    for (int i = 0; i < NUMBER_OF_ITEMS; i++) {
+        outfile << Us.solution[i];
+    }
+    outfile << std::endl;
+
+    outfile.close();
+    std::cout << "Solutions saved to solution_comparison.txt" << std::endl;
+}
+
 
 void SFLA::communicateWithProbCalc() {
     send_allData_to_selection_prob();

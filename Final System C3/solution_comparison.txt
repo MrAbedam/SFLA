@@ -1,0 +1,4 @@
+Ug Fitness: 26
+Us Fitness: 26
+Ug Solution: 010011010
+Us Solution: 010011010

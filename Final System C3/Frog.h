@@ -10,8 +10,19 @@
 #define L_MAX_ITERATION 2
 #define G_MAX_ITERATION 2
 #define EPSILON_CHANGE_UG 1
-#define STEP_SIZE_MAX 2
+#define STEP_SIZE_MAX 1
 
+/*
+good sfla parameters: (lower stepsize => better result)
+#define NUMBER_OF_FROGS 8
+#define NUMBER_OF_MEMPLEX 2
+#define NUMBER_OF_ITEMS 9
+#define Q_SELECTION 2
+#define L_MAX_ITERATION 3
+#define G_MAX_ITERATION 3
+#define EPSILON_CHANGE_UG 0
+#define STEP_SIZE_MAX 1
+*/
 
 
 struct Frog {

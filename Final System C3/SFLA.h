@@ -11,6 +11,7 @@ SC_MODULE(SFLA) {
     std::vector<std::vector<Frog>> memplexes;
     std::vector<double> selection_probabilities;
     Frog Ug;
+    Frog Us;
 
 
     // Connect to FrogGen
@@ -52,6 +53,8 @@ SC_MODULE(SFLA) {
     void send_allData_to_evolve();
 
     void receive_allData_from_evolve();
+
+    void save_solutions_to_file(const Frog & Ug, const Frog & Us);
 
     SC_CTOR(SFLA) : memplexes(NUMBER_OF_MEMPLEX) {
         SC_THREAD(start);
