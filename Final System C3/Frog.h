@@ -10,7 +10,7 @@
 #define L_MAX_ITERATION 2
 #define G_MAX_ITERATION 2
 #define EPSILON_CHANGE_UG 1
-#define STEP_SIZE_MAX 1
+#define STEP_SIZE_MAX 5
 
 
 

@@ -1,10 +1,86 @@
 
 #pragma once
+
 #include "SFLA.h"
 #include <vector>
 
 
 void SFLA::start() {
+    logProblemInfo();
+
+    cout << "\n\n                 PHASE1 _ INIT FROGS, SET FITNESS AND SORT\n";
+    communicateWithSolutionGenerator();
+    communicateWithFitnessCal();
+
+    cout << "_______________________________________________________________\n"
+         << "                   PHASE2 _ MEMPLEX PARTITION\n\n";
+
+    ///G MAX FROM HERE
+    for (int i = 0; i < G_MAX_ITERATION; i++) {
+        fitness_sorter(all_frogs, true);
+        Ug = all_frogs[0];
+
+        memplex_partition();
+        printAllFrog(true);
+
+        cout
+                << "_______________________________________________________________\n"
+                << "                   PHASE3 _ PROBABILITY CALCULATION\n";
+        compute_selection_probabilities();
+
+        cout
+                << "_______________________________________________________________\n"
+                << "                   PHASE4 _ SELECT Q FROGS\n";
+        communicateWithEvolution();
+
+        fitness_sorter(all_frogs, true);
+
+
+        if (abs(Ug.fitness - all_frogs[0].fitness) > EPSILON_CHANGE_UG) {
+            i = 0;
+        }
+
+        printAllFrog(false);
+        cout << "||||||||| iteration " << i  << " ||||||||| " << '\n';
+    }
+
+    cout << "||||||||||||||||||||||||||||||||||||\n";
+    cout << "||||||||| Final Solution |||||||||||\n";
+    cout << "          " <<Ug.fitness << " " << Ug.solution << endl;
+    cout << "||||||||||||||||||||||||||||||||||||\n";
+
+}
+
+void SFLA::communicateWithEvolution() {///EVOLUTION CALCULATOR MODULE
+// SFLA SEND TO EVOLUTION MODULE
+    send_allData_to_evolve();
+    wait(controller.evolvComplete);
+    // SFLA WAIT UNTIL EVOLUTION COMPLETE
+    receive_allData_from_evolve();
+    wait(controller.SFLA_read_EV_data_DONE);
+}
+
+void SFLA::communicateWithFitnessCal() {///FITNESS CALCULATOR MODULE
+//triggers sent to fitness
+    send_to_fitness(all_frogs);
+    wait(controller.fitness_done_event);
+    //all frogs have fitness and are ready to be received
+    receive_fitness(all_frogs);
+    wait(controller.fitness_received_event);
+    //frogs has been received
+
+}
+
+void SFLA::communicateWithSolutionGenerator() {///SOLUTION GENERATOR MODULE
+//generate and receive frogs
+    wait(controller.generated_frogs_event);
+    receive_init_frogs();
+    wait(controller.frogs_received_event);
+    //frogs has been received
+
+}
+
+void SFLA::logProblemInfo() const {
     cout << "\n                           PHASE 0 _ PARAMETERS";
     cout << "\nNUMBER_OF_FROGS " << NUMBER_OF_FROGS;
     cout << "\nNUMBER_OF_MEMPLEX " << NUMBER_OF_MEMPLEX;
@@ -15,112 +91,22 @@ void SFLA::start() {
     cout << "\nSTEP_SIZE_MAX " << STEP_SIZE_MAX;
     cout << "\nEPSILON_CHANGE_UG " << EPSILON_CHANGE_UG;
     cout << "\n _______________________________________________________________";
-    cout << "\n\n                 PHASE1 _ INIT FROGS, SET FITNESS AND SORT\n";
-
-
-    //generate and receive frogs
-    wait(controller.generated_frogs_event);
-    receive_init_frogs();
-    wait(controller.frogs_received_event);
-    //frogs has been received
-    send_to_fitness(all_frogs); //triggers sent to fitness 
-    wait(controller.fitness_done_event);
-
-    //all frogs have fitness and are ready to be received
-    receive_fitness(all_frogs);
-    wait(controller.fitness_received_event);
-
-//    cout << "\n\n\nHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n";
-//
-//    for (int i = 0; i < NUMBER_OF_FROGS; i++) {
-//        cout << all_frogs[i].fitness << "        " << all_frogs[i].solution<<'\n';
-//    }
-//
-//
-//    cout << "HAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n\n\n";
-//
-//
-//    for (int i = 0; i < NUMBER_OF_FROGS; i++) {
-//        cout << all_frogs[i].fitness << "    ";
-//    }
-    
-    //modulated till here
-
-    fitness_sorter(all_frogs, true);
-    for (int i = 0; i < NUMBER_OF_FROGS; i++) {
-        cout << "\nFitness:" << all_frogs[i].fitness << '\n';
-        for (int j = 0; j < NUMBER_OF_ITEMS; ++j) {
-            cout << all_frogs[i].solution[j] << " ";
-        }
-        cout << '\n';
-    }
-
-    cout << "_______________________________________________________________\n                   PHASE2 _ MEMPLEX PARTITION\n\n";
-
-    //GMAX FROM HERE
-
-    for (int i = 0; i < G_MAX_ITERATION ; i++){
-        fitness_sorter(all_frogs, true);
-        Ug = all_frogs[0];
-
-        /*
-        send_to_memplex_partition();
-        cout << "MANi";
-        wait(controller.memplex_done_event);
-        cout << "STICK";
-        receive_from_memplex_partition(); // tarif she
-        wait(controller.memplex_received_event); // hatman notify she dakhel*/
-
-        memplex_partition();
-
-
-        cout
-                << "_______________________________________________________________\n                   PHASE3 _ PROBABILITY CALCULATION\n";
-        compute_selection_probabilities();
-
-        cout
-                << "_______________________________________________________________\n                   PHASE4 _ SELECT Q FROGS\n";
-
-        cout << "Heyy SFLA SEND TO EVOVLE\n";
-        send_allData_to_evolve();
-        cout << "SFLA WaitingE\n";
-        wait(controller.evolvComplete);
-        cout << "SFLA Waiting end\n";
-        receive_allData_from_evolve();
-        wait(controller.SFLA_read_EV_data_DONE);
-
-        printAllFrog();
-        fitness_sorter(all_frogs, true);
-        if (abs(Ug.fitness - all_frogs[0].fitness) <= EPSILON_CHANGE_UG){
-            // Ug didnt change
-        } else{
-            i = 0;
-        }
-        // if change set i to 0
-        // if dont change i++
-        cout << "|||||||||||||||||||||||||||||| iteration "<< i<<'\n';
-    }
-
-    cout << "||||||||||||||||||||||||||||||\n";
-    cout << "||||||||| Final Solution |||||||||||\n";
-    cout << Ug.fitness << " " << Ug.solution << endl;
-    cout << "||||||||||||||||||||||||||||||\n";
-
-    //EVOLVE
 }
-void SFLA::send_allData_to_evolve(){
+
+void SFLA::send_allData_to_evolve() {
     //All frog
     for (int i = 0; i < NUMBER_OF_FROGS; ++i) {
         send_to_evolve.write(all_frogs[i]);
         cout << "Frog " << i << " sent successfully" << endl;
     }
-    for (int i = 0; i < NUMBER_OF_FROGS/NUMBER_OF_MEMPLEX; ++i) {
+    for (int i = 0; i < NUMBER_OF_FROGS / NUMBER_OF_MEMPLEX; ++i) {
         send_probs_to_evolve.write(selection_probabilities[i]);
     }
     controller.SFLA_send_data_to_EVOLV.notify();
 
 }
-void SFLA::receive_allData_from_evolve(){
+
+void SFLA::receive_allData_from_evolve() {
     all_frogs.clear();
     all_frogs.reserve(NUMBER_OF_FROGS);
 
@@ -129,7 +115,7 @@ void SFLA::receive_allData_from_evolve(){
         cout << "Frog " << i << "received from ev " << all_frogs[i].fitness << '\n';
     }
 
-    for (auto& memplex : memplexes) {
+    for (auto &memplex: memplexes) {
         memplex.clear();
     }
 
@@ -145,6 +131,7 @@ void SFLA::receive_allData_from_evolve(){
     controller.SFLA_read_EV_data_DONE.notify(SC_ZERO_TIME);
 
 }
+
 void SFLA::send_to_fitness(std::vector<Frog> &all_frogs) {
     for (int i = 0; i < NUMBER_OF_FROGS; i++) {
         solution_out.write(all_frogs[i].solution);
@@ -162,7 +149,6 @@ void SFLA::receive_fitness(std::vector<Frog> &all_frogs) {
 }
 
 
-
 void SFLA::receive_init_frogs() {
     for (int i = 0; i < NUMBER_OF_FROGS; i++) {
         Frog received_frog;
@@ -172,43 +158,32 @@ void SFLA::receive_init_frogs() {
     controller.frogs_received_event.notify(SC_ZERO_TIME);
 }
 
-void SFLA::fitness_sorter(std::vector<Frog>& frogs , bool isAllFrog) {
-    std::sort(std::begin(frogs), std::end(frogs), [](const Frog& firstFrog, const Frog& secondFrog) {
+void SFLA::fitness_sorter(std::vector<Frog> &frogs, bool isAllFrog) {
+    std::sort(std::begin(frogs), std::end(frogs), [](const Frog &firstFrog, const Frog &secondFrog) {
         return firstFrog.fitness > secondFrog.fitness;
-        });
-    if (isAllFrog){
+    });
+    if (isAllFrog) {
         for (int i = 0; i < NUMBER_OF_FROGS; i++) {
             all_frogs[i].allfrogs_index = i;
         }
     }
-//    Ug = all_frogs[0];
 }
 
 
-
-// TODO
+// TODO Create modules for this method
 void SFLA::memplex_partition() {
-    for (auto& memplex : memplexes) {
+    for (auto &memplex: memplexes) {
         memplex.clear();
     }
-
-
     for (int i = 0; i < NUMBER_OF_FROGS; i++) {
         int memplex_id = i % NUMBER_OF_MEMPLEX;
         all_frogs[i].memplex_index = memplex_id;
         all_frogs[i].memplex_offset = memplexes[memplex_id].size();
         memplexes[memplex_id].push_back(all_frogs[i]);
     }
-    for (int i = 0; i < NUMBER_OF_MEMPLEX; i++) {
-        for (int j = 0; j < NUMBER_OF_FROGS / NUMBER_OF_MEMPLEX; j++) {
-                std::cout << "[" << memplexes[i][j].fitness << ", " << i << ", " << j << "] Solution: " << memplexes[i][j].solution<<"\n";
-
-        }
-    }
 }
 
-
-
+// TODO Create modules for this method
 void SFLA::compute_selection_probabilities() {
     int n = NUMBER_OF_FROGS / NUMBER_OF_MEMPLEX; // size of each memplex
 
@@ -221,20 +196,18 @@ void SFLA::compute_selection_probabilities() {
         sum_pn += p_n;
     }
     //normalize
-    for (double& p : selection_probabilities) {
+    for (double &p: selection_probabilities) {
         p /= sum_pn;
     }
     cout << "Shared Probabilities: ";
-    for (double p : selection_probabilities) {
+    for (double p: selection_probabilities) {
         cout << p << " ";
     }
     cout << '\n';
 }
 
-// --------------------
-//TODO: HATMAN BE RESET KARDAN SELECTED FROGS HAVASEMUN BASHE 
-// --------------------
-void SFLA::printAllFrog() {
+
+void SFLA::printAllFrog(bool memplexNeeded) {
     for (int i = 0; i < NUMBER_OF_FROGS; i++) {
         cout << "\nFitness:" << all_frogs[i].fitness << '\n';
         for (int j = 0; j < NUMBER_OF_ITEMS; ++j) {
@@ -242,10 +215,14 @@ void SFLA::printAllFrog() {
         }
         cout << '\n';
     }
-    for (int i = 0; i < NUMBER_OF_MEMPLEX; i++) {
-        for (int j = 0; j < NUMBER_OF_FROGS / NUMBER_OF_MEMPLEX; j++) {
-            std::cout << "[" << memplexes[i][j].fitness << ", " << i << ", " << j << "] Solution: " << memplexes[i][j].solution<<"\n";
+    cout << '\n';
+    if (memplexNeeded){
+        for (int i = 0; i < NUMBER_OF_MEMPLEX; i++) {
+            for (int j = 0; j < NUMBER_OF_FROGS / NUMBER_OF_MEMPLEX; j++) {
+                std::cout << "[" << memplexes[i][j].fitness << ", " << i << ", " << j << "] Solution: "
+                          << memplexes[i][j].solution << "\n";
 
+            }
         }
     }
 }

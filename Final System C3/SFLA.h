@@ -48,5 +48,14 @@ SC_MODULE(SFLA) {
     SC_CTOR(SFLA) : memplexes(NUMBER_OF_MEMPLEX) {
         SC_THREAD(start);
     }
-    void printAllFrog();
+
+    void printAllFrog(bool memplexNeeded);
+
+    void logProblemInfo() const;
+
+    void communicateWithSolutionGenerator();
+
+    void communicateWithFitnessCal();
+
+    void communicateWithEvolution();
 };

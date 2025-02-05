@@ -12,7 +12,11 @@ void EvolutionModule::starter_memplex_evolution() {
         for (int i = 0; i < NUMBER_OF_MEMPLEX; i++) {
             sc_spawn(sc_bind(&EvolutionModule::memplex_evolution, this, i));
         }
-        wait(evolves_complte[0] & evolves_complte[1]);
+        sc_event_and_list all_event;
+        for (const auto & i : evolves_complte) {
+            all_event &= i;
+        }
+        wait(all_event);
 
 
         cout << "Byeee data now! \n";
@@ -30,12 +34,6 @@ void EvolutionModule::printAllFrog() {
             cout << all_frogs[i].solution[j] << " ";
         }
         cout << '\n';
-    }
-    for (int i = 0; i < NUMBER_OF_MEMPLEX; i++) {
-        for (int j = 0; j < NUMBER_OF_FROGS / NUMBER_OF_MEMPLEX; j++) {
-            std::cout << "[" << memplexes[i][j].fitness << ", " << i << ", " << j << "] Solution: " << memplexes[i][j].solution<<"\n";
-
-        }
     }
 }
 
