@@ -137,6 +137,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Controller.cpp" />
+    <ClCompile Include="EvolutionModule.cpp" />
     <ClCompile Include="FitnessEvaluator.cpp" />
     <ClCompile Include="FrogGenerator.cpp" />
     <ClCompile Include="MemplexPartition.cpp" />
@@ -146,10 +147,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Controller.h" />
+    <ClInclude Include="EvolutionModule.h" />
     <ClInclude Include="FitnessEvaluator.h" />
     <ClInclude Include="Frog.h" />
     <ClInclude Include="FrogGenerator.h" />
     <ClInclude Include="SFLA.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="items_data.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -13,7 +13,7 @@
 void FitnessEvaluator::compute_fitness() {
     wait(controller.frogs_sent_to_fitness);
 
-#if WIN32
+#if _WIN32
     std::ifstream file("items_data.txt");
 #else
     std::ifstream file("/Users/mamadhosein/Documents/Code/KNTU uni/Hardware_Software_CoDesign/SFLA-/Final System C3/items_data.txt");
