@@ -3,14 +3,14 @@
 
 
 
-#define NUMBER_OF_FROGS 6
+#define NUMBER_OF_FROGS 12
 #define NUMBER_OF_MEMPLEX 2
 #define NUMBER_OF_ITEMS 9
-#define Q_SELECTION 2
+#define Q_SELECTION 3
 #define L_MAX_ITERATION 2
 #define G_MAX_ITERATION 2
 #define EPSILON_CHANGE_UG 1
-#define STEP_SIZE_MAX 5
+#define STEP_SIZE_MAX 2
 
 
 

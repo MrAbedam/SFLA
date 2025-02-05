@@ -43,7 +43,7 @@ void SFLA::start() {
         printAllFrog(false);
         cout << "||||||||| iteration " << i  << " ||||||||| " << '\n';
     }
-
+    Ug = all_frogs[0];
     isFinalResult->write(true);
     frogSolution.write(Ug);
 

@@ -7,11 +7,11 @@
 
 int sc_main(int argc, char* argv[]) {
     //initial pop
-    sc_fifo<Frog> frog_fifo(10);
+    sc_fifo<Frog> frog_fifo(NUMBER_OF_FROGS);
 
     //fitness eval
-    sc_fifo<sc_bv<NUMBER_OF_ITEMS>> solution_fifo(10);
-    sc_fifo<int> fitness_fifo(10);
+    sc_fifo<sc_bv<NUMBER_OF_ITEMS>> solution_fifo(NUMBER_OF_FROGS);
+    sc_fifo<int> fitness_fifo(NUMBER_OF_FROGS);
     sc_fifo<Frog> sfla_to_ev(NUMBER_OF_FROGS);
     sc_fifo<Frog> ev_to_sfla(NUMBER_OF_FROGS);
     sc_fifo<double> sfla_to_ev_prb(NUMBER_OF_FROGS/NUMBER_OF_MEMPLEX);
