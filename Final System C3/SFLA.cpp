@@ -62,6 +62,15 @@ void SFLA::start() {
     for (int i = 0; i < G_MAX_ITERATION ; i++){
         fitness_sorter(all_frogs, true);
         Ug = all_frogs[0];
+
+        /*
+        send_to_memplex_partition();
+        cout << "MANi";
+        wait(controller.memplex_done_event);
+        cout << "STICK";
+        receive_from_memplex_partition(); // tarif she
+        wait(controller.memplex_received_event); // hatman notify she dakhel*/
+
         memplex_partition();
 
 
@@ -162,7 +171,26 @@ void SFLA::receive_init_frogs() {
     }
     controller.frogs_received_event.notify(SC_ZERO_TIME);
 }
+int SFLA::fitness_function(sc_bv<NUMBER_OF_ITEMS> solution) {/*
+    int value[NUMBER_OF_ITEMS] = { 8, 6, 3, 7, 6, 9, 8, 5, 6 };
+    int weight[NUMBER_OF_ITEMS] = { 5, 4, 3, 9, 5, 7, 6, 3, 2 };
+    int weight_limit = 20;*/
 
+    int total_value = 0;
+    int total_weight = 0;
+    for (int i = 0; i < NUMBER_OF_ITEMS; i++) {
+        if (solution[i] == 1) {
+            total_value += controller.value[i];
+            total_weight += controller.weight[i];
+        }
+    }
+    if (total_weight > controller.weight_limit) {
+        return -1;
+    }
+    else {
+        return total_value;
+    }
+}
 void SFLA::fitness_sorter(std::vector<Frog>& frogs , bool isAllFrog) {
     std::sort(std::begin(frogs), std::end(frogs), [](const Frog& firstFrog, const Frog& secondFrog) {
         return firstFrog.fitness > secondFrog.fitness;
