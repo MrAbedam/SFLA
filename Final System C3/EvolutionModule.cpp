@@ -196,8 +196,8 @@ bool EvolutionModule::updateUwBasedOnUb(int selected_id) {
 
     Frog &Uw = selected_frogs[selected_id][Q_SELECTION - 1];
     Frog &Ub = selected_frogs[selected_id][0];
-
-    int random_number = 1;///TODO: ADD RAND TO STEP
+    //srand(time(0));
+    int random_number =1; //rand() % 2;
 
     int maxStepSize = STEP_SIZE_MAX;
     int finalMaxStep = std::min(random_number * hamming_distance(Uw.solution, Ub.solution), maxStepSize);
@@ -242,7 +242,8 @@ bool EvolutionModule::updateUwBasedOnUg(int selected_id) {
 
     Frog &Uw = selected_frogs[selected_id][Q_SELECTION - 1];
 
-    int random_number = 1;///TODO: ADD RAND TO STEP
+    //srand(time(0));
+    int random_number =1; //rand() % 2;
 
     int maxStepSize = STEP_SIZE_MAX;
     int finalMaxStep = std::min(random_number * hamming_distance(Uw.solution, Ug.solution), maxStepSize);
