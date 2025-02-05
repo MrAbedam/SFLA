@@ -45,11 +45,9 @@ SC_MODULE(SFLA) {
 
     void memplex_partition();
 
-    void send_allData_to_selection_prob();//tbd
+    void send_allData_to_selection_prob();
 
-    //void compute_selection_probabilities();//should be removed after
-
-    void receive_allData_from_selection_prob();//tbd
+    void receive_allData_from_selection_prob();
 
     void send_allData_to_evolve();
 

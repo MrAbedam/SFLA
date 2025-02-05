@@ -192,7 +192,6 @@ void SFLA::fitness_sorter(std::vector<Frog> &frogs, bool isAllFrog) {
 }
 
 
-// TODO Create modules for this method
 void SFLA::memplex_partition() {
     for (auto &memplex: memplexes) {
         memplex.clear();
@@ -204,30 +203,6 @@ void SFLA::memplex_partition() {
         memplexes[memplex_id].push_back(all_frogs[i]);
     }
 }
-
-// TODO Create modules for this method
-/*void SFLA::compute_selection_probabilities() {
-    int n = NUMBER_OF_FROGS / NUMBER_OF_MEMPLEX; // size of each memplex
-
-    selection_probabilities.clear();
-    double sum_pn = 0;
-
-    for (int j = 1; j <= n; j++) {
-        double p_n = (2.0 * (n + 1 - j)) / (n * (n + 1));
-        selection_probabilities.push_back(p_n);
-        sum_pn += p_n;
-    }
-    //normalize
-    for (double &p: selection_probabilities) {
-        p /= sum_pn;
-    }
-    cout << "Shared Probabilities: ";
-    for (double p: selection_probabilities) {
-        cout << p << " ";
-    }
-    cout << '\n';
-}*/
-
 
 void SFLA::printAllFrog(bool memplexNeeded) {
     for (int i = 0; i < NUMBER_OF_FROGS; i++) {
