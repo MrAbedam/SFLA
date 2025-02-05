@@ -171,21 +171,23 @@ void EvolutionModule::setupUwprime(int selected_id, sc_bv<NUMBER_OF_ITEMS> &newS
 
 }
 
-int EvolutionModule::fitness_function(sc_bv<NUMBER_OF_ITEMS> solution) {
-    int value[NUMBER_OF_ITEMS] = {8, 6, 3, 7, 6, 9, 8, 5, 6};
-    int weight[NUMBER_OF_ITEMS] = {5, 4, 3, 9, 5, 7, 6, 3, 2};
-    int weight_limit = 20;
+int EvolutionModule::fitness_function(sc_bv<NUMBER_OF_ITEMS> solution) {/*
+    int value[NUMBER_OF_ITEMS] = { 8, 6, 3, 7, 6, 9, 8, 5, 6 };
+    int weight[NUMBER_OF_ITEMS] = { 5, 4, 3, 9, 5, 7, 6, 3, 2 };
+    int weight_limit = 20;*/
+
     int total_value = 0;
     int total_weight = 0;
     for (int i = 0; i < NUMBER_OF_ITEMS; i++) {
         if (solution[i] == 1) {
-            total_value += value[i];
-            total_weight += weight[i];
+            total_value += controller.value[i];
+            total_weight += controller.weight[i];
         }
     }
-    if (total_weight > weight_limit) {
+    if (total_weight > controller.weight_limit) {
         return -1;
-    } else {
+    }
+    else {
         return total_value;
     }
 }
