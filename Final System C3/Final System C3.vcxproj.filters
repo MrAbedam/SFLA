@@ -30,10 +30,10 @@
     <ClCompile Include="FitnessEvaluator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MemplexPartition.h">
-      <Filter>Header Files</Filter>
+    <ClCompile Include="EvolutionModule.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MemplexPartition.cpp">
+    <ClCompile Include="ProbabilityCalculator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -53,5 +53,31 @@
     <ClInclude Include="Controller.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EvolutionModule.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="monitor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ProbabilityCalculator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="items_data.txt" />
+    <Text Include="random_generation.txt">
+      <Filter>Source Files</Filter>
+    </Text>
+    <Text Include="solution_comparison.txt">
+      <Filter>Source Files</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="software_input.m">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="solution_comparison_matlab.m">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
