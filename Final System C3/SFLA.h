@@ -1,52 +1,52 @@
 #pragma once
+
 #include "Frog.h"
 #include "Controller.h"
-
+#include "EvolutionModule.h"
 
 SC_MODULE(SFLA) {
-	//sc_out<bool> valid_output;
-	//sc_out<sc_bv<NUMBER_OF_ITEMS>> final_frog_answer;
-	//Frog all_frogs[NUMBER_OF_FROGS];
 
-	sc_fifo_in<Frog> frog_in;
-
-	sc_fifo_out<sc_bv<NUMBER_OF_ITEMS>> solution_out; // Sending solutions to FitnessEvaluator
-	sc_fifo_in<int> fitness_in; // Receiving fitness values from FitnessEvaluator
-
-	void send_to_fitness(std::vector<Frog> &all_frogs);
-	void receive_fitness(std::vector<Frog> &all_frogs);
+    //Data
+    std::vector<Frog> all_frogs;
+    std::vector<std::vector<Frog>> memplexes;
+    std::vector<double> selection_probabilities;
+    Frog Ug;
 
 
-	std::vector<Frog> all_frogs;
-    sc_event evolves_complte[NUMBER_OF_MEMPLEX];
-	sc_event computed_fitness_event;
-	sc_event sorted_fitness_event;
-	sc_event partitioned_memplex_event;
-	sc_event computed_probabilities_event;
-	sc_event selected_q_event;
+    // Connect to FrogGen
+    sc_fifo_in<Frog> frog_in;
+
+    //Connect to Fitness
+    sc_fifo_out<sc_bv<NUMBER_OF_ITEMS>> solution_out; // Sending solutions to FitnessEvaluator
+    sc_fifo_in<int> fitness_in; // Receiving fitness values from FitnessEvaluator
+
+    //Connect to Evolution
+    sc_fifo_out<Frog> send_to_evolve;
+    sc_fifo_out<double> send_probs_to_evolve;
+
+    sc_fifo_in<Frog> receive_from_evolve;
 
 
-	//void initial_frogs(); //soft
+    void start();
 
+    void receive_init_frogs();
 
+    void send_to_fitness(std::vector<Frog> &all_frogs);
 
-	int fitness_function(sc_bv<NUMBER_OF_ITEMS> solution); //soft
-	void fitness_sorter(std::vector<Frog>&frogs, bool isAllFrog); //hard
-	void start();
-	void memplex_partition();
-	void compute_selection_probabilities();
-	void select_q_frogs(int memplex_id);
-	void evolution_frog(int selected_id);
-	int hamming_distance(sc_bv<NUMBER_OF_ITEMS>&U1, sc_bv<NUMBER_OF_ITEMS>&U2);
-	bool updateUwBasedOnUb(int selected_id);
-	bool updateUwBasedOnUg(int selected_id);
-	void setupUwprime(int selected_id, sc_bv<NUMBER_OF_ITEMS> &newSolution);
-	void receive_init_frogs();
+    void receive_fitness(std::vector<Frog> &all_frogs);
 
-	void memplex_evolution(int memplex_id);
+    void fitness_sorter(std::vector<Frog> &frogs, bool isAllFrog);
 
-	SC_CTOR(SFLA) {
-		SC_THREAD(start);
-	}
+    void memplex_partition();
 
+    void compute_selection_probabilities();
+
+    void send_allData_to_evolve();
+
+    void receive_allData_from_evolve();
+
+    SC_CTOR(SFLA) : memplexes(NUMBER_OF_MEMPLEX) {
+        SC_THREAD(start);
+    }
+    void printAllFrog();
 };
