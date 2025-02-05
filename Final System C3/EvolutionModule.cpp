@@ -145,6 +145,7 @@ void EvolutionModule::evolution_frog(int selected_id) {
             //part3 Random
         else {
             for (int j = 0; j < NUMBER_OF_ITEMS; ++j) {
+                //srand(time(0)); //just in case
                 newSolution[j] = (rand()) % 2;
             }
             cout << "\n         RANDOM USED BY MEMPLEX: " << selected_id;

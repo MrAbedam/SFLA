@@ -1,4 +1,4 @@
-Ug Fitness: 26
-Us Fitness: 26
-Ug Solution: 010011010
-Us Solution: 010011010
+Ug Fitness: 27
+Us Fitness: 23
+Ug Solution: 011110010
+Us Solution: 011010100
