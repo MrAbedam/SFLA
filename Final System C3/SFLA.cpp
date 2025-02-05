@@ -39,9 +39,11 @@ void SFLA::start() {
     send_to_fitness(all_frogs); //triggers sent to fitness 
     wait(controller.fitness_done_event);
 
+
     //all frogs have fitness and are ready to be received
     receive_fitness(all_frogs);
     wait(controller.fitness_received_event);
+
 
     for (int i = 0; i < NUMBER_OF_FROGS; i++) {
         cout << all_frogs[i].fitness << "        " << all_frogs[i].solution<<'\n';
