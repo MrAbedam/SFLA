@@ -3,7 +3,8 @@
 #### Dr.Athena Abdi , K.N Toosi University
 
 # SystemC Implementation of the Shuffled Frog Leaping Algorithm (SFLA)
-
+(Implementation of the following paper:[2202.03477v1.pdf](https://github.com/user-attachments/files/23145261/2202.03477v1.pdf))
+ 
 ## 📘 Overview
 This project provides a **SystemC-based implementation** of the **Shuffled Frog Leaping Algorithm (SFLA)** — a population-based metaheuristic inspired by memetic evolution and social learning among individuals.  
 Originally proposed by Eusuff and Lansey (2006), SFLA combines the strengths of **Particle Swarm Optimization (PSO)** and **memetic algorithms**, making it suitable for solving complex combinatorial and continuous optimization problems.
