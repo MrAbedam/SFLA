@@ -2,8 +2,56 @@
 ### Mohamadreza Abedin , Mohammadhhosein Shabaniraad
 #### Dr.Athena Abdi , K.N Toosi University
 
-# Implement System for SFLA meta heuristic algorithm
+# SystemC Implementation of the Shuffled Frog Leaping Algorithm (SFLA)
 
+## 📘 Overview
+This project provides a **SystemC-based implementation** of the **Shuffled Frog Leaping Algorithm (SFLA)** — a population-based metaheuristic inspired by memetic evolution and social learning among individuals.  
+Originally proposed by Eusuff and Lansey (2006), SFLA combines the strengths of **Particle Swarm Optimization (PSO)** and **memetic algorithms**, making it suitable for solving complex combinatorial and continuous optimization problems.
+
+This implementation models SFLA’s distributed and parallel nature through **SystemC** modules and processes, enabling simulation of population evolution at a hardware-description level.
+
+---
+
+## ⚙️ Algorithm Description
+The SFLA consists of a population of solutions (“frogs”) divided into subgroups known as **memeplexes**. Each memeplex performs a local search to improve its frogs, while periodic shuffling enables global information sharing.
+
+### Algorithm Phases
+1. **Initialization** – Randomly generate the population of frogs (solutions).  
+2. **Memeplex Division** – Partition frogs into memeplexes based on fitness.  
+3. **Local Search** – Improve the worst frog’s position using best frog influence.  
+4. **Global Shuffle** – Exchange information between memeplexes.  
+5. **Termination** – Stop when convergence or iteration limits are met.
+
+---
+
+## 🧩 SystemC Architecture
+The algorithm is implemented using **SystemC processes and channels**, representing each frog and memeplex as concurrent modules:
+
+- `Frog` module – stores position and fitness  
+- `Memeplex` module – handles local search and memetic evolution  
+- `Controller` module – manages synchronization and global shuffling  
+- `Monitor` module – tracks global best solution and convergence
+
+The architecture supports modular scalability and concurrent evaluation of frogs, reflecting real-world parallel optimization.
+
+---
+
+## 🧠 Features
+- Fully modular **SystemC simulation of SFLA**
+- Hardware-level modeling of population-based optimization
+- Adjustable hyperparameters (population size, memeplex count, step size)
+- Supports real-time convergence visualization and logging
+
+---
+
+## 🧮 Example Parameters
+| Parameter | Description |
+|------------|--------------|
+| `m` | Number of memeplexes |
+| `n` | Frogs per memeplex |
+| `Smax` | Maximum leaping step |
+| `N` | Number of local iterations |
+| `Fitness()` | User-defined objective function |
 
 
 ## Example 
